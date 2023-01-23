@@ -63,14 +63,15 @@ end
 
 """
 
-get_chromosome_steps(vChr, vLoc) => Vector(::Float64)
+get_chromosome_steps(vLoc, vChr) => Vector(::Float64)
 
 Returns a vector containing the accumulated version of 
 all maximimum loci.
 
 # Arguments
+- vLoc contains the loci 
 - vChr contains the chromosome names
-- vPos contains the loci 
+
 
 
 """
@@ -114,7 +115,9 @@ get_qtl_coord(vLoci, vChr, vLod)
 Return coordinates vectors for plotting QTL figure.
 
 # Arguments
-
+- vLoc contains the loci 
+- vChr contains the chromosome names
+- vLod contains the LOD scores
 
 
 """
