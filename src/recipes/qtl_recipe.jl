@@ -1,16 +1,16 @@
 
 ############## 
-# EQTL PLOT  #
+# QTL PLOT  #
 ##############
 
 """
-    Recipe for eQTL plots.
+    Recipe for QTL plots.
 """
-mutable struct EqtlPlot{AbstractType}
+mutable struct QtlPlot{AbstractType}
     args::Any                                      
 end
 
-eqtlplot(args...; kw...) = RecipesBase.plot(EqtlPlot{typeof(args[1])}(args); kw...)
+qtlplot(args...; kw...) = RecipesBase.plot(QtlPlot{typeof(args[1])}(args); kw...)
 
 @recipe function f(h::EqtlPlot) 
     # check types of the input arguments
@@ -112,3 +112,32 @@ eqtlplot(args...; kw...) = RecipesBase.plot(EqtlPlot{typeof(args[1])}(args); kw.
     #     x, y
     # end  
 end
+
+
+
+#=
+bar(
+        pseudotick(vec_steps[2:end])[idx_bar], 
+        repeat([y_max], length(idx_bar)), 
+        color = :lightsalmon, 
+        lc = :lightsalmon, 
+        # fill_z = 4:-1:1, 
+        alpha = 0.2, 
+        label = "", 
+        bar_width = vec_steps[2:end][idx_bar] -vec_steps[idx_bar],
+    )
+
+plot!(
+    x, y, 
+    grid = (:y),
+    legend= false,
+    xticks = (pseudotick(vec_steps[2:end]), string.(Int.(vec_chr_names))),
+    c = :skyblue4,
+    xlim = (0, maximum(x[x.!=Inf])),
+    ylim= (0, y_max), 
+    )
+vline!(
+    vec_steps[2:end],
+    linecolor= :lightgrey
+)
+=#
