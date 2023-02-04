@@ -37,8 +37,8 @@ qtlplot(args...; kw...) = RecipesBase.plot(QtlPlot{typeof(args[1])}(args); kw...
     marker --> 6
     markerstrokewidth --> 0.3
     
-    # bottom_margin --> 0
-    # right_margin --> 0
+    # bottom_margin --> (0, :mm)
+    right_margin --> (3, :mm)
     
     guidefontsize --> 15
     fontfamily --> "Helvetica"
