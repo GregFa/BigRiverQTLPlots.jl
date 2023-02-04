@@ -5,6 +5,15 @@ List of the utils functions
 
 - sortnatural
     Natural sort a string vector accounting for numeric sorting.
+
+- get_chromosome_steps
+    Returns a vector containing the accumulated version of all maximimum loci.            
+
+- get_abs_loci
+    Returns a vector containing the absolute loci.
+
+- get_qtl_coord
+    Return coordinates vectors for plotting QTL figure.
 =#
 
 
@@ -14,7 +23,7 @@ List of the utils functions
 Returns coordinates of the new ticks. 
 """
 function pseudoticks(myticks::Vector{Float64})
-    new_ticks = zeros(size(mytick,1))
+    new_ticks = zeros(size(myticks,1))
     for i in 1:size(myticks,1)
         if i == 1
             new_ticks[i] = myticks[i]/2
@@ -72,8 +81,6 @@ all maximimum loci.
 - vLoc contains the loci 
 - vChr contains the chromosome names
 
-
-
 """
 function get_chromosome_steps(vLoc, vChr)
     
@@ -91,8 +98,17 @@ function get_chromosome_steps(vLoc, vChr)
 
     return vec_steps
 end
+"""
+get_abs_loci(vLoc, vChr, vSteps) => Vector(::Float64)
 
+Returns a vector containing the absolute loci.
 
+# Arguments
+- vLoc contains the loci 
+- vChr contains the chromosome names
+- vSteps contains the accumulated version of all maximimum loci.
+
+"""
 function get_abs_loci(vLoc, vChr, vSteps)
 
     # get unique chromosome name
@@ -122,6 +138,9 @@ Return coordinates vectors for plotting QTL figure.
 
 """
 function get_qtl_coord(vLoci, vChr, vLod)
+    # get unique chromosome name
+    vec_chr_names = unique(vChr)
+
     # sort vChr, vLoci and vLOD according to vLoci 
     mData = hcat(vChr, vLoci, vLod);
     mData = sortslices(mData, dims=1, lt=(x,y)->isless(x[2],y[2]));
@@ -131,9 +150,13 @@ function get_qtl_coord(vLoci, vChr, vLod)
     x = zeros(Float64, n + length(vec_chr_names));
     y = zeros(Float64, n + length(vec_chr_names));
     
+    vecSteps = get_chromosome_steps(vLoci, vChr)
+
+    vLoci_new = get_abs_loci(vLoci, vChr, vecSteps)
+
     for i in eachindex(vec_chr_names)
         idx = getindex.((findall(vChr .== vec_chr_names[i])), 1);
-        x[idx.+i.-1] .= vPos_new[idx]
+        x[idx.+i.-1] .= vLoci_new[idx]
         x[idx[end]+i] = Inf
         
         y[idx.+i.-1] .= vLod[idx]

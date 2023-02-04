@@ -9,11 +9,13 @@ module BigriverPlots
     
     # utils functions
     include("./utils.jl");
-    export sortnatural, pseudotick
+    export sortnatural, pseudoticks
     
     # recipes for plotting 
-    include("./recipes/eqtl_recipe.jl");
-    export eqtlplot   
+    # include("./recipes/eqtl_recipe.jl");
+    # export eqtlplot   
+    include("./recipes/qtl_recipe.jl");
+    export qtlplot   
 
 
 end # module BigriverPlots
