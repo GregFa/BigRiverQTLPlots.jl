@@ -11,8 +11,8 @@ module BigriverPlots
     include("./utils.jl");
     export sortnatural, pseudoticks
     
-    # recipes for plotting 
-    # include("./recipes/eqtl_recipe.jl");
+    # plotting recipes functions 
+    include("./recipes/eqtl_recipe.jl");
     # export eqtlplot   
     include("./recipes/qtl_recipe.jl");
     export qtlplot   
