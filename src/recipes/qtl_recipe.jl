@@ -27,7 +27,7 @@ qtlplot(args...; kw...) = RecipesBase.plot(QtlPlot{typeof(args[1])}(args); kw...
     idx_bar = findall(isodd.(eachindex(steps[2:end])));
 
     # get maximum LOD value
-    y_max = round(maximum(y[y.!=Inf]));
+    y_max = 1.25*round(maximum(y[y.!=Inf]));
 
 
     # set a default value for an attribute with `-->`
@@ -50,8 +50,8 @@ qtlplot(args...; kw...) = RecipesBase.plot(QtlPlot{typeof(args[1])}(args); kw...
     link := :both
     # framestyle := [:none :axes :none]
     # yaxis := false 
-    xlims := (0, steps[end])
-    ylims := (0, y_max)
+    xlims --> (0, steps[end])
+    ylims --> (0, y_max)
     grid --> (:y)
     y_foreground_color_axis --> :white
     y_foreground_color_border --> :white

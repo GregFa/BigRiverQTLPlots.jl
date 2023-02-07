@@ -3,9 +3,9 @@ using BigriverPlots
 using Helium
 
 # Read data
-chr_file = joinpath(@__DIR__, "..", "data", "chr.he")
-pos_file = joinpath(@__DIR__, "..", "data", "pos.he")
-lod_file = joinpath(@__DIR__, "..", "data", "lod.he")
+chr_file = joinpath(@__DIR__, "..", "data", "arabidopsisdata", "chr.he")
+pos_file = joinpath(@__DIR__, "..", "data", "arabidopsisdata", "pos.he")
+lod_file = joinpath(@__DIR__, "..", "data", "arabidopsisdata", "lod.he")
 
 vecChr = BigriverPlots.Helium.readhe(chr_file);
 vecLoci = BigriverPlots.Helium.readhe(pos_file);
