@@ -1,4 +1,4 @@
-module BigriverPlots
+module BigRiverPlots
 
     # dependent packages 
     using Helium
@@ -18,6 +18,6 @@ module BigriverPlots
     export qtlplot   
 
 
-end # module BigriverPlots
+end # module BigRiverPlots
 
 
