@@ -25,12 +25,6 @@ gInfo = BulkLMM.CSV.read(gmap_file, BulkLMM.DataFrames.DataFrame);
 phenocovar_file = joinpath(bulklmmdir,"..","data/bxdData/phenocovar.csv");
 pInfo = BulkLMM.CSV.read(phenocovar_file, BulkLMM.DataFrames.DataFrame);
 
-#################
-# Preprocessing #
-#################
-# traitID = 1112;
-# pheno_y = reshape(pheno_processed[:, traitID], :, 1);
-
 ###########
 # Kinship #
 ###########
@@ -39,10 +33,15 @@ kinship = calcKinship(geno_processed);
 ########
 # Scan #
 ########
-# multipletraits_results = scan_lite_multivar(pheno_processed, geno_processed,
-                                            #   kinship, Threads.nthreads());
+multipletraits_results = scan_lite_multivar(pheno_processed, geno_processed,
+                                              kinship, Threads.nthreads());
 # Helium.writehe(multipletraits_results, "data/bxd/multipletraits_results.he")
-multipletraits_results = Helium.readhe("data/bxd/multipletraits_results.he");
+# multipletraits_results = Helium.readhe("data/bxd/multipletraits_results.he");
+
+
+########
+# Plot #
+########
 
 using BigRiverPlots
 
