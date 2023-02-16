@@ -32,8 +32,8 @@ eqtlplot(args...; kw...) = RecipesBase.plot(EqtlPlot{typeof(args[1])}(args); kw.
     marker --> 6
     markerstrokewidth --> 0.3
     
-    bottom_margin --> 0mm
-    right_margin --> 0mm
+    bottom_margin --> (0, :mm)
+    right_margin --> (0, :mm)
     
     guidefontsize --> 15
     fontfamily --> "Helvetica"
@@ -53,8 +53,8 @@ eqtlplot(args...; kw...) = RecipesBase.plot(EqtlPlot{typeof(args[1])}(args); kw.
     tickfontsize := 8
     tick_direction := :out
 
-    xticks := (pseudotick(steps), chr_names) 
-    yticks := (pseudotick(steps), chr_names)
+    xticks := (pseudoticks(steps), chr_names) 
+    yticks := (pseudoticks(steps), chr_names)
     
     
     # vertical lines
@@ -77,14 +77,14 @@ eqtlplot(args...; kw...) = RecipesBase.plot(EqtlPlot{typeof(args[1])}(args); kw.
     end
     
 
-    # main confidence plot
+    # main scatter plot
     @series begin
         seriestype := :scatter
         marker_z := lod
         framestyle := :box
         linecolor := :black#nothing
         # get the seriescolor passed by the user
-        color -->  cgrad(:blues)
+        color -->  :blues #cgrad(:blues)
         cbar --> true
 
         x, y
