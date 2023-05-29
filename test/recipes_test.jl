@@ -1,52 +1,103 @@
-using Random, MatrixLM, DataFrames, Test, RecipesBase
 
-Random.seed!(1)
+####################
+# Test eQTL Recipe #
+####################
 
-# Dimensions of matrices 
-n = 100
-m = 250
+# load data 
+bulklmmdir = dirname(pathof(BulkLMM));
 
-# Number of column covariates
-q = 20
+pheno_file = joinpath(bulklmmdir, "..", "data", "bxdData", "spleen-pheno-nomissing.csv");
+pheno = BulkLMM.DelimitedFiles.readdlm(pheno_file, ',', header = false);
+pheno_processed = pheno[2:end, 2:(end-1)].*1.0; # exclude the header, the first (transcript ID)and the last columns (sex)
 
-# Generate data with two categorical variables and 4 numerical variables.
-X_df = hcat(DataFrame(catvar1=rand(1:5, n), catvar2=rand(["A", "B", "C"], n)), DataFrame(rand(n,4),:auto))
-# Convert dataframe to predicton matrix
-X = Matrix(contr(X_df, [:catvar1, :catvar2], ["treat", "sum"]))
+geno_file = joinpath(bulklmmdir,"..", "data", "bxdData", "spleen-bxd-genoprob.csv")
+geno = BulkLMM.DelimitedFiles.readdlm(geno_file, ',', header = false);
+geno_processed = geno[2:end, 1:2:end] .* 1.0;
 
-p = size(X)[2]
-Z = rand(m,q)
-B = rand(-5:5,p,q)
-E = randn(n,m)
-Y = X*B*transpose(Z)+E
-# Construct a RawData object
-dat = RawData(Response(Y), Predictors(X, Z));
-est = mlm(dat);
+gmap_file = joinpath(bulklmmdir, "..", "data", "bxdData", "gmap.csv");
+gInfo = BulkLMM.CSV.read(gmap_file, BulkLMM.DataFrames.DataFrame);
+
+phenocovar_file = joinpath(bulklmmdir,"..", "data", "bxdData","phenocovar.csv");
+pInfo = BulkLMM.CSV.read(phenocovar_file, BulkLMM.DataFrames.DataFrame);
+
+results_path = joinpath(@__DIR__, "..", "data", "bxd", "multipletraits_results.he")
+multipletraits_results = Helium.readhe(results_path);
+
+kinship = calcKinship(geno_processed);
+
+# use get_eQTL_accMb to get eQTL plotting inputs
+x, y, z, mysteps, mychr = BigRiverPlots.get_eQTL_accMb(multipletraits_results, pInfo, gInfo; thr = 5.0);
+
+# generate plotting and save image as png to compare with the reference image 
+ploteQTL(multipletraits_results, pInfo, gInfo; thr = 5.0)
+savefig(joinpath(@__DIR__, "eQTL_new.png") )
+
+img_test = FileIO.load(joinpath(@__DIR__,"..", "images","eQTL_test.png")); # ref image
+img_new = FileIO.load(joinpath(@__DIR__, "eQTL_new.png")); # new image
+
+# test plotting results
+println("eQTL plot image test: ", @test img_test == img_new);
+
+# clear new plot
+rm(joinpath(@__DIR__, "eQTL_new.png"))
+
+# testing plotting attributes
+plot_obj = eqtlplot(x, y, z, mysteps, mychr);
+println("eQTL plot attributes :x test: ", @test plot_obj[1][3].plotattributes[:x] == x);
+println("eQTL plot attributes :y test: ", @test plot_obj[1][3].plotattributes[:y] == y);
+println("eQTL plot attributes :z test: ", @test plot_obj[1][3].plotattributes[:marker_z] == z);
 
 
-#############
-# Read Data #
-#############
+###################
+# Test QTL Recipe #
+###################
 
-vecLoci = BigRiverPlots.Helium.readhe("data/loci.he");
-vecLod = BigRiverPlots.Helium.readhe("data/lod.he");
-vecChr = string.(collect(1:5))
+# Preprocessing 
+traitID = 1112;
+pheno_y = reshape(pheno_processed[:, traitID], :, 1);
 
-rec = RecipesBase.apply_recipe(
-    Dict{Symbol, Any}(),
-    qtlplot(vecLoci, vecLod, vecSteps, string.(Int.(v_chr_names))) 
-    MLMplots(tStats, 2 ,["a" "aa" "d" "s" "sv" "zx" "eq" "j" "m" "o" ])
-)
+# Scan 
+single_results_perms = scan(
+                        pheno_y, 
+                        geno_processed, 
+                        kinship; 
+                        permutation_test = true, 
+                        nperms = 2000, 
+                        original = false
+);                          
 
-# qtlplot(x,y, vecSteps, string.(Int.(v_chr_names)))
-tStats = t_stat(est);
 
-rec = RecipesBase.apply_recipe(Dict{Symbol, Any}(), MLMplots(tStats, 2 ,["a" "aa" "d" "s" "sv" "zx" "eq" "j" "m" "o" ]))
+x, y, vecSteps, v_chr_names = get_plotqtl_inputs(single_results_perms, gInfo)
 
-# Plot the t-statistics of the coefficients
-@testset "recipe plot test" begin
-    @test rec[1].args[1] == tStats[:,2]
-    @test rec[1].plotattributes[:xticks][2] == ["a" "aa" "d" "s" "sv" "zx" "eq" "j" "m" "o"]
-end
 
-# Notes: Alternative testing could compare plot images by using Image.jl.
+# generate plotting and save image as png to compare with the reference image 
+plotQTL(single_results_perms, gInfo);
+savefig(joinpath(@__DIR__, "QTL_new.png"));
+
+plotQTL(single_results_perms, gInfo, thresholds= [0.05, 0.75]);
+savefig(joinpath(@__DIR__, "QTL_thrs_new.png"));
+
+
+img_test = FileIO.load(joinpath(@__DIR__,"..", "images","QTL_test.png")); # ref image
+img_thrs_test = FileIO.load(joinpath(@__DIR__,"..", "images","QTL_thrs_test.png")); # ref image with thresholds
+
+img_new = FileIO.load(joinpath(@__DIR__, "QTL_new.png")); # new image
+img_thrs_new = FileIO.load(joinpath(@__DIR__, "QTL_thrs_new.png")); # new image with thresholds
+
+# test plotting results
+println("QTL plot image test: ", @test img_test == img_new);
+println("QTL plot image with thresholds test: ", @test img_thrs_test == img_thrs_new);
+
+# clear new plot
+rm(joinpath(@__DIR__, "QTL_new.png"))
+rm(joinpath(@__DIR__, "QTL_thrs_new.png"))
+
+# testing plotting attributes
+max_lods = vec(mapslices(x -> maximum(x), single_results_perms; dims = 1));
+thrs = map(x -> quantile(max_lods, x), [0.05, 0.75]);
+plot_obj = qtlplot(x,y, vecSteps, v_chr_names, thrs);
+
+idx_not_Inf = findall(x .!=Inf);
+println("QTL plot attributes :x test: ", @test plot_obj[1][3].plotattributes[:x][idx_not_Inf] == x[idx_not_Inf]);
+idx_not_Inf = findall(y .!=Inf);
+println("QTL plot attributes :y test: ", @test plot_obj[1][3].plotattributes[:y][idx_not_Inf] == y[idx_not_Inf]);

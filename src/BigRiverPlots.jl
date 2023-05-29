@@ -8,20 +8,20 @@ module BigRiverPlots
     # using Random, Distributions
     
     # utils functions
-    include("./utils.jl");
+    include("./utils/utils.jl");
     export sortnatural, pseudoticks
     
-    include("./utils_qtl.jl");
-    export plotQTL
+    include("./utils/utils_qtl.jl");
+    export plotQTL, get_plotqtl_inputs
     
-    include("./utils_eqtl.jl");
+    include("./utils/utils_eqtl.jl");
     export ploteQTL
     
     # plotting recipes functions 
     include("./recipes/eqtl_recipe.jl");
-    export eqtlplot   
+    export eqtlplot, EQTLPlot   
     include("./recipes/qtl_recipe.jl");
-    export qtlplot   
+    export qtlplot, QTLPlot   
 
 
 end # module BigRiverPlots

@@ -6,22 +6,28 @@
 """
     Recipe for QTL plots.
 """
-mutable struct QtlPlot{AbstractType}
-    args::Any                                      
-end
+# mutable struct QtlPlot{AbstractType}
+#     args::Any                                      
+# end
 
-qtlplot(args...; kw...) = RecipesBase.plot(QtlPlot{typeof(args[1])}(args); kw...)
+# qtlplot(args...; kw...) = RecipesBase.plot(QtlPlot{typeof(args[1])}(args); kw...)
 
-@recipe function f(h::QtlPlot) 
+@userplot QTLPlot
+
+@recipe function f(h::QTLPlot) 
     # check types of the input arguments
-    if length(h.args) != 4 || !(typeof(h.args[1]) <: AbstractVector) ||
+    if length(h.args) < 4 || !(typeof(h.args[1]) <: AbstractVector) ||
         !(typeof(h.args[2]) <: AbstractVector) || !(typeof(h.args[3]) <: AbstractVector) ||
         !(typeof(h.args[4]) <: AbstractVector)  
-        error("QTL Plots should be given four vectors.  Got: $(typeof(h.args))")
+        error("QTL Plots should be given at least four vectors.  Got: $(typeof(h.args))")
     end
         
     # get arguments
-    x, y, steps, chr_names = h.args
+    if length(h.args) == 4
+        x, y, steps, chr_names = h.args
+    else
+        x, y, steps, chr_names, thresh = h.args
+    end
 
     # get number of shaded area for chromosomes
     idx_bar = findall(isodd.(eachindex(steps[2:end])));
@@ -109,4 +115,18 @@ qtlplot(args...; kw...) = RecipesBase.plot(QtlPlot{typeof(args[1])}(args); kw...
         steps[1:end]
         
     end
+
+    ####################
+    # Horizontal lines #
+    ####################
+    if length(h.args) == 5
+        @series begin
+            seriestype := :hline
+            linecolor --> :red
+            linestyle --> :dash
+            primary := false
+            # alpha := 0.5
+            thresh
+        end
+    end    
 end

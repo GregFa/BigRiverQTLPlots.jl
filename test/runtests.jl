@@ -1,5 +1,7 @@
 using BigRiverPlots
 using Helium
+using Plots
+using FileIO
 using Test
 
 # Generate test data

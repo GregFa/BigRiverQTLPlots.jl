@@ -6,13 +6,15 @@
 """
     Recipe for eQTL plots.
 """
-mutable struct EqtlPlot{AbstractType}
-    args::Any                                      
-end
+# mutable struct EqtlPlot{AbstractType}
+#     args::Any                                      
+# end
 
-eqtlplot(args...; kw...) = RecipesBase.plot(EqtlPlot{typeof(args[1])}(args); kw...)
+# eqtlplot(args...; kw...) = RecipesBase.plot(EqtlPlot{typeof(args[1])}(args); kw...)
 
-@recipe function f(h::EqtlPlot) 
+@userplot EQTLPlot
+
+@recipe function f(h::EQTLPlot) 
     # check types of the input arguments
     if length(h.args) != 5 || !(typeof(h.args[1]) <: AbstractVector) ||
         !(typeof(h.args[2]) <: AbstractVector) || !(typeof(h.args[3]) <: AbstractVector) ||
