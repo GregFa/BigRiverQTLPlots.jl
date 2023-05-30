@@ -1,5 +1,5 @@
-using BigRiverPlots
-using Helium
+using BigRiverPlots, BulkLMM
+using Helium, Statistics
 using Plots
 using FileIO
 using Test
@@ -8,5 +8,6 @@ using Test
 # include("test_data.jl")
 
 @testset "BigRiverPlots.jl" begin
-    include("utils_test.jl")
+    include("utils_tests.jl")
+    include("recipes_tests.jl")
 end
