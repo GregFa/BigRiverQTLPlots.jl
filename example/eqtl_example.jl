@@ -45,5 +45,5 @@ end
 ########
 # Plot #
 ########
-ploteQTL(multipletraits_results, pInfo, gInfo; thr = 5.0);
+ploteQTL(multipletraits_results, pInfo, gInfo; threshold = 5.0);
 savefig(joinpath(@__DIR__,"..","images","eQTL_test.png"))
