@@ -34,7 +34,7 @@ kinship = calcKinship(geno_processed);
 ########
 # Scan #
 ########
-results_path = joinpath(@__DIR__, "data", "multipletraits_results.he")
+results_path = joinpath(@__DIR__, "..", "data", "multipletraits_results.he")
 if isfile(results_path)
     multipletraits_results = Helium.readhe(results_path);
 else
@@ -45,5 +45,5 @@ end
 ########
 # Plot #
 ########
-ploteQTL(multipletraits_results, pInfo, gInfo; threshold = 5.0);
+plot_eQTL(multipletraits_results, pInfo, gInfo; threshold = 5.0);
 savefig(joinpath(@__DIR__,"..","images","eQTL_test.png"))

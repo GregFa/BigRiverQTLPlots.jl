@@ -12,10 +12,10 @@ module BigRiverPlots
     export sortnatural, pseudoticks
     
     include("./utils/utils_qtl.jl");
-    export plotQTL, get_plotqtl_inputs
+    export plot_QTL, get_plot_QTL_inputs
     
     include("./utils/utils_eqtl.jl");
-    export ploteQTL
+    export plot_eQTL
     
     # plotting recipes functions 
     include("./recipes/eqtl_recipe.jl");

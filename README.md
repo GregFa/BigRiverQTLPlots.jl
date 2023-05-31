@@ -5,9 +5,9 @@
 ## Features
 Here are the main functions provided by BigRiverPlots.jl:
 
-- `plotQTL()`: This function generates plots for LOD (logarithm of odds) scores with respect to marker positions. It's useful in viewing one genome scan result, or even multiple genome scan results, on a single plot. This helps to provide a broad overview of the QTL landscape.
+- `plot_QTL()`: This function generates plots for LOD (logarithm of odds) scores with respect to marker positions. It's useful in viewing one genome scan result, or even multiple genome scan results, on a single plot. This helps to provide a broad overview of the QTL landscape.
 
-- `ploteQTL()`: This function is specifically designed to plot eQTL analysis results, assisting in visualization of genetic associations with gene expression levels.
+- `plot_eQTL()`: This function is specifically designed to plot eQTL analysis results, assisting in visualization of genetic associations with gene expression levels.
 
 - `confplot()`: This function is designed to create vertical confidence plots. These plots provide an insightful representation of statistical certainty or variability in the data.
 
@@ -27,20 +27,20 @@ After installing `BigRiverPlots.jl`, you can include it in your Julia script usi
 using BigRiverPlots
 ```
 
-From there, you can start using `plotQTL`, `ploteQTL`, and `confplot` to plot your data. For example:
+From there, you can start using `plot_QTL`, `plot_eQTL`, and `confplot` to plot your data. For example:
 
 ```julia
 # Assuming `single_results_perms` are restulting lod scores
 # gInfo contains genotype information  
-plotQTL(single_results_perms, gInfo)
+plot_QTL(single_results_perms, gInfo)
 
 
 # Assuming `lod_scores` are in multipletraits_results
 # pInfo contains phenotype information
 # gInfo contains genotype information  
 # thresh is your LOD threshold value
-ploteQTL(multipletraits_results, pInfo, gInfo; threshold = 5.0)
-plotQTL(single_results_perms, gInfo)
+plot_eQTL(multipletraits_results, pInfo, gInfo; threshold = 5.0)
+plot_QTL(single_results_perms, gInfo)
 
 
 # Assuming `confidence_data` is your data

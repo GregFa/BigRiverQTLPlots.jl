@@ -29,7 +29,7 @@ kinship = calcKinship(geno_processed);
 x, y, z, mysteps, mychr = BigRiverPlots.get_eQTL_accMb(multipletraits_results, pInfo, gInfo; threshold = 5.0);
 
 # generate plotting and save image as png to compare with the reference image 
-ploteQTL(multipletraits_results, pInfo, gInfo; threshold = 5.0)
+plot_eQTL(multipletraits_results, pInfo, gInfo; threshold = 5.0)
 savefig(joinpath(@__DIR__, "eQTL_new.png") )
 
 img_test = FileIO.load(joinpath(@__DIR__,"..", "images","eQTL_test.png")); # ref image
@@ -67,14 +67,14 @@ single_results_perms = scan(
 );                          
 
 
-x, y, vecSteps, v_chr_names = get_plotqtl_inputs(single_results_perms, gInfo)
+x, y, vecSteps, v_chr_names = get_plot_QTL_inputs(single_results_perms, gInfo)
 
 
 # generate plotting and save image as png to compare with the reference image 
-plotQTL(single_results_perms, gInfo);
+plot_QTL(single_results_perms, gInfo);
 savefig(joinpath(@__DIR__, "QTL_new.png"));
 
-plotQTL(single_results_perms, gInfo, thresholds= [0.05, 0.75]);
+plot_QTL(single_results_perms, gInfo, thresholds= [0.05, 0.75]);
 savefig(joinpath(@__DIR__, "QTL_thrs_new.png"));
 
 

@@ -111,39 +111,39 @@ function get_qtl_coord(vLoci, vChr, vLod)
 end
 
 """
-get_plotqtl_inputs(mLOD::Array{Float64, 2}, dfgInfo::DataFrame;
+get_plot_QTL_inputs(mLOD::Array{Float64, 2}, dfgInfo::DataFrame;
                     chrColname::String = "Chr", mbColname::String = "Mb")
 
 Generates a scatter plot for QTL analysis.
 
 ## Arguments
-- `mLOD` is the matrix containing the maximum value of LOD score of each phenotype and its corresponding index.
+- `vLOD` is the vector containing the maximum value of LOD score of each phenotype and its corresponding index.
 - `dfpInfo` is a dataframe containing the phenotype information such as probeset, chromosomes names and Mb distance.
 - `dfgInfo` is a dataframe containing the genotype information such as locus, cM distance, chromosomes names and Mb distance. 
 - `chrColname` is the name of the column containing the chromosomes' names, default name is "Chr".
 - `mbColname` is the name of the column containing the megabase DNA length, default name is "Mb". 
 
 """
-function get_plotqtl_inputs(mLOD::Array{Float64, 2}, dfgInfo::DataFrame;
+function get_plot_QTL_inputs(vLod::Array{Float64, 1}, dfgInfo::DataFrame;
                             chrColname::String = "Chr", mbColname::String = "Mb")
 
     vecChr = String.(dfgInfo[:, Symbol(chrColname)]);
     vecLoci = dfgInfo[:, Symbol(mbColname)];
-    vecLod = mLOD[:,1];
+    
 
     # get unique chr id
     v_chr_names = sortnatural(unique(vecChr));
 
     vecSteps = get_chromosome_steps(vecLoci, vecChr);
 
-    x, y = get_qtl_coord(vecLoci, vecChr, vecLod);
+    x, y = get_qtl_coord(vecLoci, vecChr, vLod);
 
     return x, y, vecSteps, v_chr_names
 end
 
 
 """
-plotQTL(mLOD::Array{Float64, 2}, dfgInfo::DataFrame;
+plot_QTL(mLOD::Array{Float64, 2}, dfgInfo::DataFrame;
         chrColname::String = "Chr", mbColname::String = "Mb", 
         thresholds = [],
         kwargs...)
@@ -159,17 +159,18 @@ Generates a scatter plot for QTL analysis.
 - `thresholds` is real number vector containing desired quantile thresholds for plotting.
 
 """
-function plotQTL(mLOD::Array{Float64, 2}, dfgInfo::DataFrame;
+function plot_QTL(objScan::NamedTuple, dfgInfo::DataFrame;
                 chrColname::String = "Chr", mbColname::String = "Mb", 
                 thresholds = [],
                 kwargs...)
 
-    x, y, vecSteps, v_chr_names = get_plotqtl_inputs(mLOD, dfgInfo;
-                                    chrColname = chrColname, mbColname = mbColname)
 
-                
-    if !isempty(thresholds)
-        max_lods = vec(mapslices(x -> maximum(x), mLOD; dims = 1));
+    x, y, vecSteps, v_chr_names = get_plot_QTL_inputs(objScan.lod, dfgInfo;
+                            chrColname = chrColname, mbColname = mbColname)
+
+
+    if (!isempty(thresholds)) && (size(mLOD, 2) > 1) 
+        max_lods = vec(mapslices(x -> maximum(x), mLOD[:, 2:end]; dims = 1));
         thrs = map(x -> quantile(max_lods, x), thresholds);
         qtlplot(x,y, vecSteps, v_chr_names, thrs, kwargs...)
     else

@@ -115,7 +115,7 @@ end
 
 
 """
-ploteQTL(multiLODs::Array{Float64, 2}, dfpInfo::DataFrame, dfgInfo::DataFrame;
+plot_eQTL(multiLODs::Array{Float64, 2}, dfpInfo::DataFrame, dfgInfo::DataFrame;
          threshold::Float64 = 5.0, kwargs...)
 
 Generates a scatter plot for eQTL analysis.
@@ -127,7 +127,7 @@ Generates a scatter plot for eQTL analysis.
 - `threshold` is the LOD threshold value, default is `5.0``.
 
 """
-function ploteQTL(multiLODs::Array{Float64, 2}, dfpInfo::DataFrame, dfgInfo::DataFrame;
+function plot_eQTL(multiLODs::Array{Float64, 2}, dfpInfo::DataFrame, dfgInfo::DataFrame;
                   threshold::Float64 = 5.0, kwargs...)
 
     # get coordinates ready for plotting

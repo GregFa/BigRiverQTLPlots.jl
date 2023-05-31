@@ -49,16 +49,21 @@ single_results_perms = scan(
                         kinship; 
                         permutation_test = true, 
                         nperms = 2000, 
-                        original = false
+                        original = true
 );                                             
 
+single_results = scan(
+                        pheno_y, 
+                        geno_processed, 
+                        kinship
+);     
 ########
 # Plot #
 ########
-plotQTL(single_results_perms, gInfo)
+plot_QTL(single_results, gInfo)
 savefig(joinpath(@__DIR__,"..","images","QTL_test.png"))
 
-plotQTL(single_results_perms, gInfo, thresholds= [0.05, 0.75])
+plot_QTL(single_results_perms, gInfo, thresholds= [0.90, 0.95])
 savefig(joinpath(@__DIR__,"..","images","QTL_thrs_test.png"))
 
 
