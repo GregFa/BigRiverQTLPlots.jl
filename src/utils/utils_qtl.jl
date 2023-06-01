@@ -1,5 +1,7 @@
 #=
 List of the utils functions
+-
+
 - get_chromosome_steps
     Returns a vector containing the accumulated version of all maximimum loci.            
 
@@ -8,7 +10,32 @@ List of the utils functions
 
 - get_qtl_coord
     Return coordinates vectors for plotting QTL figure.
+
+- plot_QTL
+    Generates a scatter plot for QTL analysis.        
+
 =#
+
+"""
+
+get_chromosome_steps(vLoc, vChr) => Vector(::Float64)
+
+Returns a vector containing the accumulated version of 
+all maximimum loci.
+
+# Arguments
+- vLoc contains the loci 
+- vChr contains the chromosome names
+"""
+
+function perms_threshold(mLOD::Matrix(Real), thresholds) 
+    # get maximum values for each column
+    max_lods = vec(mapslices(x -> maximum(x), mLOD; dims = 1));
+    # get LOD values corresponding significances values
+    thresholds_lod = map(x -> quantile(max_lods, x), thresholds);
+
+    return thresholds_lod
+end
 
 
 """
