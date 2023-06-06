@@ -18,17 +18,19 @@ List of the utils functions
 
 """
 
-get_chromosome_steps(vLoc, vChr) => Vector(::Float64)
-
-Returns a vector containing the accumulated version of 
-all maximimum loci.
+function perms_thresholds(mLOD::Matrix(Real), thresholds::Vector{Real}) 
+Returns LOD thresholds.
 
 # Arguments
-- vLoc contains the loci 
-- vChr contains the chromosome names
+- mLOD is a matrix containing the LOD scores permutations.
+- thresholds contains the significant levels.
+
+# Output
+- thresholds_lod contains the LOD scores corresponding to the significant levels.
+
 """
 
-function perms_threshold(mLOD::Matrix(Real), thresholds) 
+function perms_thresholds(mLOD::Matrix{Real}, thresholds::Vector{Real}) 
     # get maximum values for each column
     max_lods = vec(mapslices(x -> maximum(x), mLOD; dims = 1));
     # get LOD values corresponding significances values
@@ -141,7 +143,7 @@ end
 get_plot_QTL_inputs(mLOD::Array{Float64, 2}, dfgInfo::DataFrame;
                     chrColname::String = "Chr", mbColname::String = "Mb")
 
-Generates a scatter plot for QTL analysis.
+Obtains required input to generates a QTL plot.
 
 ## Arguments
 - `vLOD` is the vector containing the maximum value of LOD score of each phenotype and its corresponding index.

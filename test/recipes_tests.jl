@@ -26,7 +26,7 @@ multipletraits_results = Helium.readhe(results_path);
 kinship = calcKinship(geno_processed);
 
 # use get_eQTL_accMb to get eQTL plotting inputs
-x, y, z, mysteps, mychr = BigRiverPlots.get_eQTL_accMb(multipletraits_results, pInfo, gInfo; threshold = 5.0);
+x, y, z, mysteps, mychr = BigRiverQTLPlots.get_eQTL_accMb(multipletraits_results, pInfo, gInfo; threshold = 5.0);
 
 # generate plotting and save image as png to compare with the reference image 
 plot_eQTL(multipletraits_results, pInfo, gInfo; threshold = 5.0)

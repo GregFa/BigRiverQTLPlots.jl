@@ -1,5 +1,5 @@
 
-using BigRiverPlots
+using BigRiverQTLPlots
 using BulkLMM, Helium
 using Plots
 

@@ -1,4 +1,4 @@
-module BigRiverPlots
+module BigRiverQTLPlots
 
     # dependent packages 
     using DataFrames, Statistics, Helium
@@ -8,20 +8,25 @@ module BigRiverPlots
     # using Random, Distributions
     
     # utils functions
-    include("./utils/utils.jl");
+    include("utils.jl");
     export sortnatural, pseudoticks
     
-    include("./utils/utils_qtl.jl");
+
+    # qtl functions
+    include("./qtl/qtl_recipe.jl");
+    export qtlplot, QTLPlot  
+
+    include("./qtl/qtl_helpers.jl");
     export plot_QTL, get_plot_QTL_inputs
     
-    include("./utils/utils_eqtl.jl");
-    export plot_eQTL
     
-    # plotting recipes functions 
-    include("./recipes/eqtl_recipe.jl");
+    # eqtl functions 
+    include("./eqtl/eqtl_recipe.jl");
     export eqtlplot, EQTLPlot   
-    include("./recipes/qtl_recipe.jl");
-    export qtlplot, QTLPlot   
+
+    include("./eqtl/eqtl_helpers.jl");
+    export plot_eQTL
 
 
-end # module BigRiverPlots
+
+end # module BigRiverQTLPlots
