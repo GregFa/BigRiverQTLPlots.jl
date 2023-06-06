@@ -3,16 +3,16 @@ List of the utils functions
 -
 
 - get_chromosome_steps
-    Returns a vector containing the accumulated version of all maximimum loci.            
+	Returns a vector containing the accumulated version of all maximimum loci.            
 
 - get_pseudo_loci
-    Returns a vector containing the pseudo "accumulated" loci (mB).
+	Returns a vector containing the pseudo "accumulated" loci (mB).
 
 - get_qtl_coord
-    Return coordinates vectors for plotting QTL figure.
+	Return coordinates vectors for plotting QTL figure.
 
 - plot_QTL
-    Generates a scatter plot for QTL analysis.        
+	Generates a scatter plot for QTL analysis.        
 
 =#
 
@@ -23,20 +23,27 @@ Returns LOD thresholds.
 
 # Arguments
 - mLOD is a matrix containing the LOD scores permutations.
-- thresholds contains the significant levels.
+- thresholds contains the significant levels, default values are 0.90 and 0.95.
 
 # Output
 - thresholds_lod contains the LOD scores corresponding to the significant levels.
 
 """
 
-function perms_thresholds(mLOD::Matrix{Real}, thresholds::Vector{Real}) 
-    # get maximum values for each column
-    max_lods = vec(mapslices(x -> maximum(x), mLOD; dims = 1));
-    # get LOD values corresponding significances values
-    thresholds_lod = map(x -> quantile(max_lods, x), thresholds);
+function perms_thresholds(mLOD::Matrix{Real}, thresholds::Vector{Real} = [0.90, 0.95])
 
-    return thresholds_lod
+	# default thresholds
+	if isempty(thresholds)
+		thresholds = [0.90, 0.95]
+	end
+
+	# get maximum values for each column
+	max_lods = vec(mapslices(x -> maximum(x), mLOD; dims = 1))
+
+	# get LOD values corresponding significances values
+	thresholds_lod = map(x -> quantile(max_lods, x), thresholds)
+
+	return thresholds_lod
 end
 
 
@@ -53,20 +60,20 @@ all maximimum loci.
 
 """
 function get_chromosome_steps(vLoc, vChr)
-    
-    # get unique chromosome name
-    vec_chr_names = unique(vChr)
 
-    # initiate steps vector
-    vec_steps = zeros(length(vec_chr_names))
+	# get unique chromosome name
+	vec_chr_names = unique(vChr)
 
-    for i in eachindex(vec_chr_names) 
-        vec_steps[i] = maximum(vLoc[findall(vChr .== vec_chr_names[i])]) 
-    end
-    
-    vec_steps = vcat([0], accumulate(+, vec_steps))
+	# initiate steps vector
+	vec_steps = zeros(length(vec_chr_names))
 
-    return vec_steps
+	for i in eachindex(vec_chr_names)
+		vec_steps[i] = maximum(vLoc[findall(vChr .== vec_chr_names[i])])
+	end
+
+	vec_steps = vcat([0], accumulate(+, vec_steps))
+
+	return vec_steps
 end
 """
 get_pseudo_loci(vLoc, vChr, vSteps) => Vector(::Float64)
@@ -81,18 +88,18 @@ Returns a vector containing the pseudo "accumulated" loci (mB).
 """
 function get_pseudo_loci(vLoc, vChr, vSteps)
 
-    # get unique chromosome name
-    vec_chr_names = unique(vChr)
+	# get unique chromosome name
+	vec_chr_names = unique(vChr)
 
-    # generate new distances coordinates
-    vLoc_new = copy(vLoc);
-    
-    for i in eachindex(vec_chr_names)
-        idx = findall(vChr .== vec_chr_names[i])
-        vLoc_new[idx] = vLoc_new[idx] .+ vSteps[i]
-    end
+	# generate new distances coordinates
+	vLoc_new = copy(vLoc)
 
-    return vLoc_new
+	for i in eachindex(vec_chr_names)
+		idx = findall(vChr .== vec_chr_names[i])
+		vLoc_new[idx] = vLoc_new[idx] .+ vSteps[i]
+	end
+
+	return vLoc_new
 end
 
 """
@@ -108,42 +115,42 @@ Return coordinates vectors for plotting QTL figure.
 
 """
 function get_qtl_coord(vLoci, vChr, vLod)
-    # get unique chromosome name
-    vec_chr_names = unique(vChr)
+	# get unique chromosome name
+	vec_chr_names = unique(vChr)
 
-    # sort vChr, vLoci and vLOD according to vLoci 
-    mData = hcat(vChr, vLoci, vLod);
-    mData = sortslices(mData, dims=1, lt=(x,y)->isless(x[2],y[2]));
+	# sort vChr, vLoci and vLOD according to vLoci 
+	mData = hcat(vChr, vLoci, vLod)
+	mData = sortslices(mData, dims = 1, lt = (x, y) -> isless(x[2], y[2]))
 
-    n = size(mData, 1);
-    # insert Inf to obtain separation in plotting
-    x = zeros(Float64, n + length(vec_chr_names));
-    y = zeros(Float64, n + length(vec_chr_names));
-    
-    vecSteps = get_chromosome_steps(vLoci, vChr)
+	n = size(mData, 1)
+	# insert Inf to obtain separation in plotting
+	x = zeros(Float64, n + length(vec_chr_names))
+	y = zeros(Float64, n + length(vec_chr_names))
 
-    vLoci_new = get_pseudo_loci(vLoci, vChr, vecSteps)
+	vecSteps = get_chromosome_steps(vLoci, vChr)
 
-    for i in eachindex(vec_chr_names)
-        idx = getindex.((findall(vChr .== vec_chr_names[i])), 1);
-        x[idx.+i.-1] .= vLoci_new[idx]
-        x[idx[end]+i] = Inf
-        
-        y[idx.+i.-1] .= vLod[idx]
-        y[idx[end]+i] = Inf
-    end
-    
-    x = x[1:end-1]
-    y = y[1:end-1]
+	vLoci_new = get_pseudo_loci(vLoci, vChr, vecSteps)
 
-    return x, y
+	for i in eachindex(vec_chr_names)
+		idx = getindex.((findall(vChr .== vec_chr_names[i])), 1)
+		x[idx.+i.-1] .= vLoci_new[idx]
+		x[idx[end]+i] = Inf
+
+		y[idx.+i.-1] .= vLod[idx]
+		y[idx[end]+i] = Inf
+	end
+
+	x = x[1:end-1]
+	y = y[1:end-1]
+
+	return x, y
 end
 
 """
-get_plot_QTL_inputs(mLOD::Array{Float64, 2}, dfgInfo::DataFrame;
-                    chrColname::String = "Chr", mbColname::String = "Mb")
+get_plot_QTL_inputs(vLOD::Vector{Real}, dfgInfo::DataFrame;
+					chrColname::String="Chr", mbColname::String="Mb")
 
-Obtains required input to generates a QTL plot.
+Obtains required inputs to generates a QTL plot.
 
 ## Arguments
 - `vLOD` is the vector containing the maximum value of LOD score of each phenotype and its corresponding index.
@@ -153,29 +160,28 @@ Obtains required input to generates a QTL plot.
 - `mbColname` is the name of the column containing the megabase DNA length, default name is "Mb". 
 
 """
-function get_plot_QTL_inputs(vLod::Array{Float64, 1}, dfgInfo::DataFrame;
-                            chrColname::String = "Chr", mbColname::String = "Mb")
+function get_plot_QTL_inputs(vLOD::Vector{Real}, dfgInfo::DataFrame;
+	chrColname::String = "Chr", mbColname::String = "Mb")
 
-    vecChr = String.(dfgInfo[:, Symbol(chrColname)]);
-    vecLoci = dfgInfo[:, Symbol(mbColname)];
-    
+	vecChr = String.(dfgInfo[:, Symbol(chrColname)])
+	vecLoci = dfgInfo[:, Symbol(mbColname)]
 
-    # get unique chr id
-    v_chr_names = sortnatural(unique(vecChr));
 
-    vecSteps = get_chromosome_steps(vecLoci, vecChr);
+	# get unique chr id
+	v_chr_names = sortnatural(unique(vecChr))
 
-    x, y = get_qtl_coord(vecLoci, vecChr, vLod);
+	vecSteps = get_chromosome_steps(vecLoci, vecChr)
 
-    return x, y, vecSteps, v_chr_names
+	x, y = get_qtl_coord(vecLoci, vecChr, vLOD)
+
+	return x, y, vecSteps, v_chr_names
 end
 
 
 """
-plot_QTL(mLOD::Array{Float64, 2}, dfgInfo::DataFrame;
-        chrColname::String = "Chr", mbColname::String = "Mb", 
-        thresholds = [],
-        kwargs...)
+plot_QTL(vLOD::Vector{Real}, dfgInfo::DataFrame;
+		chrColname::String="Chr", mbColname::String="Mb",
+		thresholds::Vector{Real}=[], kwargs...)
 
 Generates a scatter plot for QTL analysis.
 
@@ -185,25 +191,55 @@ Generates a scatter plot for QTL analysis.
 - `dfgInfo` is a dataframe containing the genotype information such as locus, cM distance, chromosomes names and Mb distance. 
 - `chrColname` is the name of the column containing the chromosomes' names, default name is "Chr".
 - `mbColname` is the name of the column containing the megabase DNA length, default name is "Mb". 
-- `thresholds` is real number vector containing desired quantile thresholds for plotting.
+- `thresholds` is real number vector containing desired LOD score thresholds for plotting.
+
+___
+
+plot_QTL(scanresult::NamedTuple, dfgInfo::DataFrame;
+		chrColname::String="Chr", mbColname::String="Mb", 
+		thresholds::Vector{Real}=[], kwargs...)
+
+Generates a scatter plot for QTL analysis.
+
+## Arguments
+- `scanresult` is NamedTuple object resulting from the `scan()` function in `BulkLMM.jl`.
+- `dfgInfo` is a dataframe containing the genotype information such as locus, cM distance, chromosomes names and Mb distance. 
+- `chrColname` is the name of the column containing the chromosomes' names, default name is "Chr".
+- `mbColname` is the name of the column containing the megabase DNA length, default name is "Mb". 
+- `thresholds` is real number vector containing significant levels to estimate LOD score thresholds.
 
 """
-function plot_QTL(objScan::NamedTuple, dfgInfo::DataFrame;
-                chrColname::String = "Chr", mbColname::String = "Mb", 
-                thresholds = [],
-                kwargs...)
+function plot_QTL(vLOD::Vector{Real}, dfgInfo::DataFrame;
+	chrColname::String = "Chr", mbColname::String = "Mb",
+	thresholds::Vector{Real} = [], kwargs...)
 
+	x, y, vecSteps, v_chr_names = get_plot_QTL_inputs(vLOD, dfgInfo;
+		chrColname = chrColname, mbColname = mbColname)
 
-    x, y, vecSteps, v_chr_names = get_plot_QTL_inputs(objScan.lod, dfgInfo;
-                            chrColname = chrColname, mbColname = mbColname)
+	if isempty(thresholds)
+		qtlplot(x, y, vecSteps, v_chr_names, kwargs...)
+	else
+		qtlplot(x, y, vecSteps, v_chr_names, thrs, kwargs...)
+	end
 
+end
 
-    if (!isempty(thresholds)) && (size(mLOD, 2) > 1) 
-        max_lods = vec(mapslices(x -> maximum(x), mLOD[:, 2:end]; dims = 1));
-        thrs = map(x -> quantile(max_lods, x), thresholds);
-        qtlplot(x,y, vecSteps, v_chr_names, thrs, kwargs...)
-    else
-        qtlplot(x,y, vecSteps, v_chr_names, kwargs...)
-    end
+function plot_QTL(scanresult::NamedTuple, dfgInfo::DataFrame;
+	chrColname::String = "Chr", mbColname::String = "Mb",
+	thresholds::Vector{Real} = [], kwargs...)
+
+	if (:L_perms in keys(scanresult))
+		thrshlds = perms_thresholds(scanresult.L_perms, thresholds)
+	else
+		thrshlds = thresholds
+	end
+
+	plot_QTL(
+		scanresult.lod, dfgInfo;
+		chrColname = chrColname,
+		mbColname = mbColname,
+		thresholds = thrshlds,
+		kwargs...,
+	)
 
 end
