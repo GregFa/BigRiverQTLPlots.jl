@@ -9,8 +9,6 @@ Here are the main functions provided by BigRiverQTLPlots.jl:
 
 - `plot_eQTL()`: This function is specifically designed to plot eQTL analysis results, assisting in visualization of genetic associations with gene expression levels.
 
-- `confplot()`: This function is designed to create vertical confidence plots. These plots provide an insightful representation of statistical certainty or variability in the data.
-
 ## Installation
 To install `BigRiverQTLPlots.jl`, you can use Julia's package manager. Here is the command:
 

@@ -49,7 +49,7 @@ single_results_perms = scan(
 	kinship;
 	permutation_test = true,
 	nperms = 2000,
-	original = true,
+	original = false,
 );
 
 single_results = scan(
@@ -60,9 +60,10 @@ single_results = scan(
 ########
 # Plot #
 ########
-plot_QTL(single_results, gInfo)
+plot_QTL(single_results.lod, gInfo)
 savefig(joinpath(@__DIR__, "..", "images", "QTL_test.png"))
 
-plot_QTL(single_results_perms, gInfo, thresholds = [0.90, 0.95])
+thr = BigRiverQTLPlots.perms_thresholds(single_results_perms, [0.90, 0.95])
+plot_QTL(single_results.lod, gInfo, thresholds = thr)
 savefig(joinpath(@__DIR__, "..", "images", "QTL_thrs_test.png"))
 

@@ -18,7 +18,7 @@ List of the utils functions
 
 """
 
-function perms_thresholds(mLOD::Matrix(Real), thresholds::Vector{Real}) 
+function perms_thresholds(mLOD::Matrix(<: AbstractFloat), thresholds::Vector{<: AbstractFloat}) 
 Returns LOD thresholds.
 
 # Arguments
@@ -30,7 +30,7 @@ Returns LOD thresholds.
 
 """
 
-function perms_thresholds(mLOD::Matrix{Real}, thresholds::Vector{Real} = [0.90, 0.95])
+function perms_thresholds(mLOD::Matrix{<: AbstractFloat}, thresholds::Vector = [0.90, 0.95])
 
 	# default thresholds
 	if isempty(thresholds)
@@ -147,7 +147,7 @@ function get_qtl_coord(vLoci, vChr, vLod)
 end
 
 """
-get_plot_QTL_inputs(vLOD::Vector{Real}, dfgInfo::DataFrame;
+get_plot_QTL_inputs(vLOD::Vector{<: AbstractFloat}, dfgInfo::DataFrame;
 					chrColname::String="Chr", mbColname::String="Mb")
 
 Obtains required inputs to generates a QTL plot.
@@ -160,7 +160,7 @@ Obtains required inputs to generates a QTL plot.
 - `mbColname` is the name of the column containing the megabase DNA length, default name is "Mb". 
 
 """
-function get_plot_QTL_inputs(vLOD::Vector{Real}, dfgInfo::DataFrame;
+function get_plot_QTL_inputs(vLOD::Vector{<: AbstractFloat}, dfgInfo::DataFrame;
 	chrColname::String = "Chr", mbColname::String = "Mb")
 
 	vecChr = String.(dfgInfo[:, Symbol(chrColname)])
@@ -179,25 +179,24 @@ end
 
 
 """
-plot_QTL(vLOD::Vector{Real}, dfgInfo::DataFrame;
+plot_QTL(vLOD::Vector{<: AbstractFloat}, dfgInfo::DataFrame;
 		chrColname::String="Chr", mbColname::String="Mb",
-		thresholds::Vector{Real}=[], kwargs...)
+		thresholds::Vector{<: AbstractFloat}=[], kwargs...)
 
 Generates a scatter plot for QTL analysis.
 
 ## Arguments
-- `mLOD` is the matrix containing the maximum value of LOD score of each phenotype and its corresponding index.
-- `dfpInfo` is a dataframe containing the phenotype information such as probeset, chromosomes names and Mb distance.
+- `vLOD` is the vector containing the maximum value of LOD score.
 - `dfgInfo` is a dataframe containing the genotype information such as locus, cM distance, chromosomes names and Mb distance. 
 - `chrColname` is the name of the column containing the chromosomes' names, default name is "Chr".
 - `mbColname` is the name of the column containing the megabase DNA length, default name is "Mb". 
-- `thresholds` is real number vector containing desired LOD score thresholds for plotting.
+- `thresholds` is <: AbstractFloat number vector containing desired LOD score thresholds for plotting.
 
-___
+---
 
 plot_QTL(scanresult::NamedTuple, dfgInfo::DataFrame;
 		chrColname::String="Chr", mbColname::String="Mb", 
-		thresholds::Vector{Real}=[], kwargs...)
+		thresholds::Vector{<: AbstractFloat}=[], kwargs...)
 
 Generates a scatter plot for QTL analysis.
 
@@ -206,12 +205,12 @@ Generates a scatter plot for QTL analysis.
 - `dfgInfo` is a dataframe containing the genotype information such as locus, cM distance, chromosomes names and Mb distance. 
 - `chrColname` is the name of the column containing the chromosomes' names, default name is "Chr".
 - `mbColname` is the name of the column containing the megabase DNA length, default name is "Mb". 
-- `thresholds` is real number vector containing significant levels to estimate LOD score thresholds.
+- `thresholds` is <: AbstractFloat number vector containing significant levels to estimate LOD score thresholds.
 
 """
-function plot_QTL(vLOD::Vector{Real}, dfgInfo::DataFrame;
+function plot_QTL(vLOD::Vector{<: AbstractFloat}, dfgInfo::DataFrame;
 	chrColname::String = "Chr", mbColname::String = "Mb",
-	thresholds::Vector{Real} = [], kwargs...)
+	thresholds::Vector = [], kwargs...)
 
 	x, y, vecSteps, v_chr_names = get_plot_QTL_inputs(vLOD, dfgInfo;
 		chrColname = chrColname, mbColname = mbColname)
@@ -219,14 +218,14 @@ function plot_QTL(vLOD::Vector{Real}, dfgInfo::DataFrame;
 	if isempty(thresholds)
 		qtlplot(x, y, vecSteps, v_chr_names, kwargs...)
 	else
-		qtlplot(x, y, vecSteps, v_chr_names, thrs, kwargs...)
+		qtlplot(x, y, vecSteps, v_chr_names, thresholds, kwargs...)
 	end
 
 end
 
 function plot_QTL(scanresult::NamedTuple, dfgInfo::DataFrame;
 	chrColname::String = "Chr", mbColname::String = "Mb",
-	thresholds::Vector{Real} = [], kwargs...)
+	thresholds::Vector = [], kwargs...)
 
 	if (:L_perms in keys(scanresult))
 		thrshlds = perms_thresholds(scanresult.L_perms, thresholds)
