@@ -44,7 +44,7 @@ x, y, z, mysteps, mychr = BigRiverQTLPlots.get_eQTL_accMb(
 );
 
 # generate plotting and save image as png to compare with the reference image 
-plot_eQTL(multipletraits_results, pInfo, gInfo; threshold = 5.0)
+plot_eQTL(multipletraits_results, pInfo_subset, gInfo_subset; threshold = 5.0)
 savefig(joinpath(@__DIR__, "eQTL_new.png"))
 
 img_test = FileIO.load(joinpath(@__DIR__, "..", "images", "eQTL_test.png")); # ref image
