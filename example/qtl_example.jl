@@ -114,7 +114,3 @@ savefig(joinpath(@__DIR__, "..", "images", "QTL_test.png"))
 thr = BigRiverQTLPlots.perms_thresholds(single_results_perms, [0.90, 0.95])
 plot_QTL(single_results.lod, gInfo, thresholds = thr)
 savefig(joinpath(@__DIR__, "..", "images", "QTL_thrs_test.png"))
-
-rng = MersenneTwister(0);
-example_drawn = rand(rng);
-println("Number drawn from example: ", example_drawn)

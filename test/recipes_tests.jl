@@ -142,15 +142,6 @@ println("QTL plot image test: ", @test (img_test == img_new));
 # testing plotting attributes
 plot_obj = qtlplot(x, y, vecSteps, v_chr_names, thrs);
 
-## test draw a number from test:
-rng = MersenneTwister(0);
-test_drawn = rand(rng);
-println("Number drawn from test: ", test_drawn)
-
-## test first element from test:
-println("First element from test: ", single_results_perms[1, 1])
-
-
 
 idx_not_Inf = findall(x .!= Inf);
 println("QTL plot attributes :x test: ", @test plot_obj[1][3].plotattributes[:x][idx_not_Inf] == x[idx_not_Inf]);
