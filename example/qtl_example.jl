@@ -3,6 +3,7 @@ using BigRiverQTLPlots
 using BulkLMM
 using Random, Statistics
 using Plots
+using Helium
 
 
 ##############
