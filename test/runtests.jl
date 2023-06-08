@@ -1,7 +1,7 @@
 using BigRiverQTLPlots, BulkLMM
-using Helium, Statistics
+using Statistics, Random
 using Plots
-using FileIO
+using FileIO, Helium
 using Test
 
 

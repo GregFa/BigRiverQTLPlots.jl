@@ -33,9 +33,6 @@ geno_processed = geno[2:end, 1:2:end] .* 1.0;
 geno_processed = geno_processed[:, idx_geno];
 
 
-
-
-
 ###########
 # Kinship #
 ###########

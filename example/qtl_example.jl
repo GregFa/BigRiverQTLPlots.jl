@@ -1,7 +1,7 @@
 
 using BigRiverQTLPlots
-using BulkLMM, Helium
-using Statistics
+using BulkLMM
+using Random, Statistics
 using Plots
 
 
@@ -43,6 +43,15 @@ kinship = calcKinship(geno_processed);
 ########
 # Scan #
 ########
+using Random 
+# rng = MersenneTwister(2023)
+# Random.seed!(MersenneTwister(2023))
+# rand(1)
+# rand(Xoshiro(100))
+
+# x = [1,2,3,4,5,6,7,8,9,10];
+# rng = Xoshiro(0);shuffle(rng, x)
+single_results_perms2 = Helium.readhe(joinpath(@__DIR__,"..", "test", "scan_perms.he"));
 single_results_perms = scan(
 	pheno_y,
 	geno_processed,
