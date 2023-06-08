@@ -89,6 +89,14 @@ single_results_perms2 = Helium.readhe(joinpath(@__DIR__,
 							"..", "test", "scan_perms.he"));
 single_results_perms2 == single_results_perms
 
+
+thrs = BigRiverQTLPlots.perms_thresholds(
+	single_results_perms, [0.90, 0.95]) |> permutedims;
+thrs_test = Helium.readhe(joinpath(@__DIR__,
+	"..", "test", "thrs_test.he"));
+thrs == thrs_test
+vcat(thrs, thrs_test)
+
 single_results = scan(
 	pheno_y,
 	geno_processed,

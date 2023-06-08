@@ -117,7 +117,11 @@ plot_QTL(single_results.lod, gInfo);
 savefig(joinpath(@__DIR__, "QTL_new.png"));
 
 
-thrs = BigRiverQTLPlots.perms_thresholds(single_results_perms, [0.90, 0.95])
+thrs = BigRiverQTLPlots.perms_thresholds(
+	single_results_perms, [0.90, 0.95]);
+mthrs = thrs|> permutedims;
+Helium.writehe(mthrs, joinpath(@__DIR__, "thrs_test.he"))
+
 plot_QTL(single_results.lod, gInfo, thresholds = thrs);
 savefig(joinpath(@__DIR__, "QTL_thrs_new.png"));
 
