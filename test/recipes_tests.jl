@@ -9,8 +9,9 @@ bulklmmdir = dirname(pathof(BulkLMM));
 
 gmap_file = joinpath(bulklmmdir, "..", "data", "bxdData", "gmap.csv");
 gInfo = BulkLMM.CSV.read(gmap_file, BulkLMM.DataFrames.DataFrame);
-idx_geno = findall(occursin.(gInfo.Chr, "1 2 3 4 5"));
-gInfo_subset = gInfo[idx_geno, :];
+
+# idx_geno = findall(occursin.(gInfo.Chr, "1 2 3 4 5"));
+# gInfo_subset = gInfo[idx_geno, :];
 
 phenocovar_file = joinpath(bulklmmdir, "..", "data", "bxdData", "phenocovar.csv");
 pInfo = BulkLMM.CSV.read(phenocovar_file, BulkLMM.DataFrames.DataFrame);
@@ -20,6 +21,7 @@ pInfo = BulkLMM.CSV.read(phenocovar_file, BulkLMM.DataFrames.DataFrame);
 pheno_file = joinpath(bulklmmdir, "..", "data", "bxdData", "spleen-pheno-nomissing.csv");
 pheno = BulkLMM.DelimitedFiles.readdlm(pheno_file, ',', header = false);
 pheno_processed = pheno[2:end, 2:(end-1)] .* 1.0; # exclude the header, the first (transcript ID)and the last columns (sex)
+
 # pheno_processed_subset = pheno_processed[:, idx_pheno];
 
 geno_file = joinpath(bulklmmdir, "..", "data", "bxdData", "spleen-bxd-genoprob.csv")
@@ -68,11 +70,13 @@ geno_processed = geno[2:end, 1:2:end] .* 1.0;
 # Test QTL Recipe #
 ###################
 
-kinship = calcKinship(geno_processed);
-Helium.writehe(kinship, joinpath(@__DIR__, "K_test.he"))
 # Preprocessing 
 traitID = 1112;
 pheno_y = reshape(pheno_processed[:, traitID], :, 1);
+
+kinship = calcKinship(geno_processed);
+Helium.writehe(kinship, joinpath(@__DIR__, "K_test.he"))
+
 
 # Scan 
 single_results_perms = scan(
@@ -81,7 +85,7 @@ single_results_perms = scan(
 	kinship;
 	permutation_test = true,
 	nperms = 2000,
-	original = false,
+	original = true,
 );
 
 Helium.writehe(single_results_perms, joinpath(@__DIR__, "scan_perms.he"))
@@ -92,13 +96,17 @@ single_results = scan(
 	kinship,
 );
 
+Helium.writehe(reshape(single_results.lod, :,1), joinpath(@__DIR__, "scan_test.he"))
+
+
 x = [1,2,3,4,5,6,7,8,9,10].*1.0;
 mX = reshape(x, :,1)
 mX_perms = BulkLMM.transform_permute(mX; nperms = 2000, original = false);
 Helium.writehe(mX_perms, joinpath(@__DIR__, "mX_perms.he"))
 
 K_eigen = BulkLMM.eigen(kinship);
-Helium.writehe(mX_perms, joinpath(@__DIR__, "eigen_test.he"))
+K_eigen = reshape(K_eigen.values,:,1);
+Helium.writehe(K_eigen, joinpath(@__DIR__, "eigen_test.he"))
 
 
 x, y, vecSteps, v_chr_names = get_plot_QTL_inputs(single_results.lod, gInfo);
@@ -133,6 +141,16 @@ println("QTL plot image test: ", @test (img_test == img_new));
 
 # testing plotting attributes
 plot_obj = qtlplot(x, y, vecSteps, v_chr_names, thrs);
+
+## test draw a number from test:
+rng = MersenneTwister(0);
+test_drawn = rand(rng);
+println("Number drawn from test: ", test_drawn)
+
+## test first element from test:
+println("First element from test: ", single_results_perms[1, 1])
+
+
 
 idx_not_Inf = findall(x .!= Inf);
 println("QTL plot attributes :x test: ", @test plot_obj[1][3].plotattributes[:x][idx_not_Inf] == x[idx_not_Inf]);
