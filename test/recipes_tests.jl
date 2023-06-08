@@ -14,20 +14,20 @@ gInfo_subset = gInfo[idx_geno, :];
 
 phenocovar_file = joinpath(bulklmmdir, "..", "data", "bxdData", "phenocovar.csv");
 pInfo = BulkLMM.CSV.read(phenocovar_file, BulkLMM.DataFrames.DataFrame);
-idx_pheno = findall(occursin.(pInfo.Chr, "1 2 3 4 5"));
-pInfo_subset = pInfo[idx_pheno, :];
+# idx_pheno = findall(occursin.(pInfo.Chr, "1 2 3 4 5"));
+# pInfo_subset = pInfo[idx_pheno, :];
 
 pheno_file = joinpath(bulklmmdir, "..", "data", "bxdData", "spleen-pheno-nomissing.csv");
 pheno = BulkLMM.DelimitedFiles.readdlm(pheno_file, ',', header = false);
 pheno_processed = pheno[2:end, 2:(end-1)] .* 1.0; # exclude the header, the first (transcript ID)and the last columns (sex)
-pheno_processed_subset = pheno_processed[:, idx_pheno];
+# pheno_processed_subset = pheno_processed[:, idx_pheno];
 
 geno_file = joinpath(bulklmmdir, "..", "data", "bxdData", "spleen-bxd-genoprob.csv")
 geno = BulkLMM.DelimitedFiles.readdlm(geno_file, ',', header = false);
 geno_processed = geno[2:end, 1:2:end] .* 1.0;
-geno_processed_subset = geno_processed[:, idx_geno];
+# geno_processed_subset = geno_processed[:, idx_geno];
 
-kinship_subset = calcKinship(geno_processed_subset);
+# kinship_subset = calcKinship(geno_processed_subset);
 
 
 # multipletraits_results, heritability_results = bulkscan_null(
@@ -69,7 +69,7 @@ kinship_subset = calcKinship(geno_processed_subset);
 ###################
 
 kinship = calcKinship(geno_processed);
-
+Helium.writehe(kinship, joinpath(@__DIR__, "K_test.he"))
 # Preprocessing 
 traitID = 1112;
 pheno_y = reshape(pheno_processed[:, traitID], :, 1);
@@ -96,6 +96,9 @@ x = [1,2,3,4,5,6,7,8,9,10].*1.0;
 mX = reshape(x, :,1)
 mX_perms = BulkLMM.transform_permute(mX; nperms = 2000, original = false);
 Helium.writehe(mX_perms, joinpath(@__DIR__, "mX_perms.he"))
+
+K_eigen = BulkLMM.eigen(kinship);
+Helium.writehe(mX_perms, joinpath(@__DIR__, "eigen_test.he"))
 
 
 x, y, vecSteps, v_chr_names = get_plot_QTL_inputs(single_results.lod, gInfo);

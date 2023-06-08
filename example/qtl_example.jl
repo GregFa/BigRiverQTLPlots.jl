@@ -49,7 +49,14 @@ using Random
 # rand(1)
 # rand(Xoshiro(100))
 
-# x = [1,2,3,4,5,6,7,8,9,10];
+x = [1,2,3,4,5,6,7,8,9,10].*1.0;
+mX = reshape(x, :,1)
+mX_src =  BulkLMM.transform_permute(mX; nperms = 2000, original = false);
+mX_test = Helium.readhe(joinpath(@__DIR__,"..", "test", "mX_perms.he"));
+mX_test == mX_src
+
+K_eigen = BulkLMM.eigen(kinship);
+eign_test = Helium.readhe(joinpath(@__DIR__,"..", "test", "eigen_test.he"));
 # rng = Xoshiro(0);shuffle(rng, x)
 single_results_perms2 = Helium.readhe(joinpath(@__DIR__,"..", "test", "scan_perms.he"));
 single_results_perms = scan(
@@ -60,7 +67,7 @@ single_results_perms = scan(
 	nperms = 2000,
 	original = false,
 );
-
+single_results_perms2 == single_results_perms
 single_results = scan(
 	pheno_y,
 	geno_processed,
