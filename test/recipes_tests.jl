@@ -27,6 +27,13 @@ pheno_processed = pheno[2:end, 2:(end-1)] .* 1.0; # exclude the header, the firs
 geno_file = joinpath(bulklmmdir, "..", "data", "bxdData", "spleen-bxd-genoprob.csv")
 geno = BulkLMM.DelimitedFiles.readdlm(geno_file, ',', header = false);
 geno_processed = geno[2:end, 1:2:end] .* 1.0;
+
+X = geno_processed.-0.5;
+Y = 2 .* (X*X')./size(X,2) .+ 0.5;
+Y[BulkLMM.LinearAlgebra.diagind(Y)] .= 1.0
+
+Helium.writehe(Y, joinpath(@__DIR__, "Y_test.he"))
+
 # geno_processed_subset = geno_processed[:, idx_geno];
 
 # kinship_subset = calcKinship(geno_processed_subset);
@@ -74,7 +81,7 @@ geno_processed = geno[2:end, 1:2:end] .* 1.0;
 traitID = 1112;
 pheno_y = reshape(pheno_processed[:, traitID], :, 1);
 
-kinship = calcKinship(geno_processed);
+kinship =Y # calcKinship(geno_processed);
 Helium.writehe(kinship, joinpath(@__DIR__, "K_test.he"))
 
 

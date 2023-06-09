@@ -9,7 +9,7 @@ module BigRiverQTLPlots
     
     # utils functions
     include("utils.jl");
-    export sortnatural, pseudoticks
+    export sortnatural, pseudoticks,calcKinship2
     
 
     # qtl functions
