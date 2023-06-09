@@ -1,10 +1,11 @@
-using BigRiverPlots
-using Helium
+using BigRiverQTLPlots, BulkLMM
+using Statistics, Random
+using Plots
+using FileIO, Helium
 using Test
 
-# Generate test data
-# include("test_data.jl")
 
-@testset "BigRiverPlots.jl" begin
-    include("utils_test.jl")
+@testset "BigRiverQTLPlots.jl" begin
+    include("utils_tests.jl")
+    include("recipes_tests.jl")
 end

@@ -1,7 +1,10 @@
-using Plots, Plots.PlotMeasures 
-using BigRiverPlots
+
+using BigRiverQTLPlots
+using BulkLMM
+using Random, Statistics
+using Plots
 using Helium
-using Statistics
+
 
 ##############
 # BXD spleen #
@@ -12,19 +15,28 @@ using Statistics
 ########
 bulklmmdir = dirname(pathof(BulkLMM));
 
-pheno_file = joinpath(bulklmmdir,"..","data/bxdData/spleen-pheno-nomissing.csv");
-pheno = BulkLMM.DelimitedFiles.readdlm(pheno_file, ',', header = false);
-pheno_processed = pheno[2:end, 2:(end-1)].*1.0; # exclude the header, the first (transcript ID)and the last columns (sex)
+gmap_file = joinpath(bulklmmdir, "..", "data", "bxdData", "gmap.csv");
+gInfo = BulkLMM.CSV.read(gmap_file, BulkLMM.DataFrames.DataFrame);
 
-geno_file = joinpath(bulklmmdir,"..","data/bxdData/spleen-bxd-genoprob.csv")
+# idx_geno = findall(occursin.(gInfo.Chr, "1 2 3 4 5"));
+# gInfo_subset = gInfo[idx_geno, :];
+
+phenocovar_file = joinpath(bulklmmdir, "..", "data", "bxdData", "phenocovar.csv");
+pInfo = BulkLMM.CSV.read(phenocovar_file, BulkLMM.DataFrames.DataFrame);
+
+# idx_pheno = findall(occursin.(pInfo.Chr, "1 2 3 4 5"));
+# pInfo_subset = pInfo[idx_pheno, :];
+
+
+pheno_file = joinpath(bulklmmdir, "..", "data", "bxdData", "spleen-pheno-nomissing.csv");
+pheno = BulkLMM.DelimitedFiles.readdlm(pheno_file, ',', header = false);
+pheno_processed = pheno[2:end, 2:(end-1)] .* 1.0; # exclude the header, the first (transcript ID)and the last columns (sex)
+
+geno_file = joinpath(bulklmmdir, "..", "data", "bxdData", "spleen-bxd-genoprob.csv")
 geno = BulkLMM.DelimitedFiles.readdlm(geno_file, ',', header = false);
 geno_processed = geno[2:end, 1:2:end] .* 1.0;
 
-gmap_file = joinpath(bulklmmdir,"..","data/bxdData/gmap.csv");
-gInfo = BulkLMM.CSV.read(gmap_file, BulkLMM.DataFrames.DataFrame);
 
-phenocovar_file = joinpath(bulklmmdir,"..","data/bxdData/phenocovar.csv");
-pInfo = BulkLMM.CSV.read(phenocovar_file, BulkLMM.DataFrames.DataFrame);
 
 #################
 # Preprocessing #
@@ -36,73 +48,78 @@ pheno_y = reshape(pheno_processed[:, traitID], :, 1);
 # Kinship #
 ###########
 kinship = calcKinship(geno_processed);
+K_test = Helium.readhe(joinpath(@__DIR__,"..", "test", "K_test.he"));
+K_test == kinship
+
+Helium.writehe(kinship, joinpath(@__DIR__,"..", "test", "K_original.he"))
+K_read = Helium.readhe(joinpath(@__DIR__,"..", "test", "K_original.he"));
+K_read == kinship
+
 
 
 ########
 # Scan #
 ########
-single_results = scan(pheno_y, geno_processed, kinship);
+using Random 
+# rng = MersenneTwister(2023)
+# Random.seed!(MersenneTwister(2023))
+# rand(1)
+# rand(Xoshiro(100))
 
-single_results_perms = scan_perms_lite(pheno_y, geno_processed, kinship; 
-                                             nperms = 1000, original = true);
+x = [1,2,3,4,5,6,7,8,9,10].*1.0;
+mX = reshape(x, :,1)
+mX_src =  BulkLMM.transform_permute(mX; nperms = 2000, original = false);
+mX_test = Helium.readhe(joinpath(@__DIR__,"..", "test", "mX_perms.he"));
+mX_test == mX_src
 
-#############
-# Threshold #
-#############
+K_eigen = BulkLMM.eigen(kinship);
+eigen_test = Helium.readhe(joinpath(@__DIR__,"..", "test", "eigen_test.he"));
+# rng = Xoshiro(0);shuffle(rng, x)
 
-max_lods = vec(mapslices(x -> maximum(x), single_results_perms; dims = 1));
-thrs = map(x -> quantile(max_lods, x), [0.85, 0.95]);
+single_results_perms = scan(
+	pheno_y,
+	geno_processed,
+	kinship;
+	permutation_test = true,
+	nperms = 2000,
+	original = true,
+);
 
-
-########
-# Plot #
-########
-
-vecChr = String.(gInfo.Chr);
-vecLoci = gInfo.Mb;
-vecLod = single_results_perms[:,1];
-using BigRiverPlots
-plotQTL(single_results_perms, gInfo)
-hline!([thrs], color = "red", linestyle=:dash, label = "")
+single_results_perms2 = Helium.readhe(joinpath(@__DIR__,
+							"..", "test", "scan_perms.he"));
+single_results_perms2 == single_results_perms
 
 
+thrs = BigRiverQTLPlots.perms_thresholds(
+	single_results_perms, [0.90, 0.95]) |> permutedims;
+thrs_test = Helium.readhe(joinpath(@__DIR__,
+	"..", "test", "thrs_test.he"));
+thrs == thrs_test
+vcat(thrs, thrs_test)
+
+single_results = scan(
+	pheno_y,
+	geno_processed,
+	kinship,
+);
 
 
-###############
-# Arabidopsis #
-###############
+single_results3 = scan(
+	pheno_y,
+	geno_processed,
+	kinship,
+);
 
-########
-# Data #
-########
-
-# Read data
-chr_file = joinpath(@__DIR__, "..", "data", "arabidopsisdata", "chr.he")
-pos_file = joinpath(@__DIR__, "..", "data", "arabidopsisdata", "pos.he")
-lod_file = joinpath(@__DIR__, "..", "data", "arabidopsisdata", "lod.he")
-
-vecChr = BigRiverPlots.Helium.readhe(chr_file);
-vecLoci = BigRiverPlots.Helium.readhe(pos_file);
-vecLod = BigRiverPlots.Helium.readhe(lod_file);
-
-#################
-# Preprocessing #
-#################
-
-vecSteps = BigRiverPlots.get_chromosome_steps(vecLoci, vecChr)
-
-# get unique chr id
-v_chr_names = unique(vecChr)
-
-vPos_new = BigRiverPlots.get_pseudo_loci(vecLoci, vecChr, vecSteps)
-
-# generate new distances coordinates
-
-x, y = BigRiverPlots.get_qtl_coord(vecLoci, vecChr, vecLod)
+single_results2 = Helium.readhe(joinpath(@__DIR__,
+							"..", "test", "scan_test.he"));
+single_results2 == single_results.lod
 
 ########
 # Plot #
 ########
+plot_QTL(single_results.lod, gInfo)
+savefig(joinpath(@__DIR__, "..", "images", "QTL_test.png"))
 
-qtlplot(x,y, vecSteps, string.(Int.(v_chr_names)))
-    
+thr = BigRiverQTLPlots.perms_thresholds(single_results_perms, [0.90, 0.95])
+plot_QTL(single_results.lod, gInfo, thresholds = thr)
+savefig(joinpath(@__DIR__, "..", "images", "QTL_thrs_test.png"))
