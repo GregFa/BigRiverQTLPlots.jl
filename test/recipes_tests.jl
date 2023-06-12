@@ -92,10 +92,9 @@ single_results_perms = scan(
 	kinship;
 	permutation_test = true,
 	nperms = 2000,
-	original = true,
 );
 
-Helium.writehe(single_results_perms, joinpath(@__DIR__, "scan_perms.he"))
+Helium.writehe(single_results_perms.L_perms, joinpath(@__DIR__, "scan_perms.he"))
 
 single_results = scan(
 	pheno_y,
@@ -105,56 +104,58 @@ single_results = scan(
 
 Helium.writehe(reshape(single_results.lod, :,1), joinpath(@__DIR__, "scan_test.he"))
 
-
-x = [1,2,3,4,5,6,7,8,9,10].*1.0;
-mX = reshape(x, :,1)
-mX_perms = BulkLMM.transform_permute(mX; nperms = 2000, original = false);
-Helium.writehe(mX_perms, joinpath(@__DIR__, "mX_perms.he"))
-
-K_eigen = BulkLMM.eigen(kinship);
-K_eigen = reshape(K_eigen.values,:,1);
-Helium.writehe(K_eigen, joinpath(@__DIR__, "eigen_test.he"))
-
-
 x, y, vecSteps, v_chr_names = get_plot_QTL_inputs(single_results.lod, gInfo);
-
 
 # generate plotting and save image as png to compare with the reference image 
 plot_QTL(single_results.lod, gInfo);
-savefig(joinpath(@__DIR__, "QTL_new.png"));
+savefig(joinpath(@__DIR__, "QTL_test.png"));
+
+# generate plotting with thresholds obtain from perms_thresholds()
+plot_QTL(single_results_perms, gInfo, thresholds = [0.90, 0.95]);
+savefig(joinpath(@__DIR__, "QTL_thrs_test_1.png"));
+
+# generate plotting with manual thresholds
+thrs = BigRiverQTLPlots.perms_thresholds(single_results_perms.L_perms, [0.90, 0.95]);
+plot_QTL(single_results_perms.lod, gInfo, thresholds = thrs);
+savefig(joinpath(@__DIR__, "QTL_thrs_test_2.png"));
 
 
-thrs = BigRiverQTLPlots.perms_thresholds(
-	single_results_perms, [0.90, 0.95]);
-mthrs = thrs|> permutedims;
-Helium.writehe(mthrs, joinpath(@__DIR__, "thrs_test.he"))
+img_ref = FileIO.load(joinpath(@__DIR__, "..", "images", "QTL_example.png")); # ref image
+img_thrs_ref = FileIO.load(joinpath(@__DIR__, "..", "images", "QTL_thrs_example.png")); # ref image with thresholds
 
-plot_QTL(single_results.lod, gInfo, thresholds = thrs);
-savefig(joinpath(@__DIR__, "QTL_thrs_new.png"));
-
-
-img_test = FileIO.load(joinpath(@__DIR__, "..", "images", "QTL_test.png")); # ref image
-img_thrs_test = FileIO.load(joinpath(@__DIR__, "..", "images", "QTL_thrs_test.png")); # ref image with thresholds
-
-img_new = FileIO.load(joinpath(@__DIR__, "QTL_new.png")); # new image
-img_thrs_new = FileIO.load(joinpath(@__DIR__, "QTL_thrs_new.png")); # new image with thresholds
+img_test = FileIO.load(joinpath(@__DIR__, "QTL_test.png")); # new image
+img_thrs_test_1 = FileIO.load(joinpath(@__DIR__, "QTL_thrs_test_1.png")); # new image with thresholds
+img_thrs_test_2 = FileIO.load(joinpath(@__DIR__, "QTL_thrs_test_2.png")); # new image with thresholds
 
 # test plotting results
-println("QTL plot image test: ", @test (img_test == img_new));
+println("QTL plot image test: ", @test (img_test == img_ref));
 # println("QTL plot image test2: ", @test (sum(img_test .== img_new) == size(img_new,1)*size(img_new,2)));
-# println("QTL plot image with thresholds test: ", @test img_thrs_test == img_thrs_new);
+println("QTL plot image with thresholds (auto) test: ", @test img_thrs_test_1 == img_thrs_ref);
+println("QTL plot image with thresholds (manual) test: ", @test img_thrs_test_2 == img_thrs_ref);
 # println("QTL plot image test2: ", 
 # 	@test (sum(img_thrs_test .== img_thrs_new) == size(img_thrs_new,1)*size(img_thrs_new,2)));
 
 # clear new plot
-# rm(joinpath(@__DIR__, "QTL_new.png"))
-# rm(joinpath(@__DIR__, "QTL_thrs_new.png"))
+rm(joinpath(@__DIR__, "QTL_test.png"))
+rm(joinpath(@__DIR__, "QTL_thrs_test_1.png"))
+rm(joinpath(@__DIR__, "QTL_thrs_test_2.png"))
+
 
 # testing plotting attributes
 plot_obj = qtlplot(x, y, vecSteps, v_chr_names, thrs);
 
-
 idx_not_Inf = findall(x .!= Inf);
-println("QTL plot attributes :x test: ", @test plot_obj[1][3].plotattributes[:x][idx_not_Inf] == x[idx_not_Inf]);
+println("QTL plot attributes :x test: ", 
+			@test plot_obj[1][3].plotattributes[:x][idx_not_Inf] == x[idx_not_Inf]);
 idx_not_Inf = findall(y .!= Inf);
-println("QTL plot attributes :y test: ", @test plot_obj[1][3].plotattributes[:y][idx_not_Inf] == y[idx_not_Inf]);
+println("QTL plot attributes :y test: ", 
+			@test plot_obj[1][3].plotattributes[:y][idx_not_Inf] == y[idx_not_Inf]);
+
+
+
+
+
+# thrs = BigRiverQTLPlots.perms_thresholds(
+# 	single_results_perms, [0.90, 0.95]);
+# mthrs = thrs|> permutedims;
+# Helium.writehe(mthrs, joinpath(@__DIR__, "thrs_test.he"))
