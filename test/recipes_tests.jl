@@ -60,7 +60,7 @@ img_test = FileIO.load(joinpath(@__DIR__, "eQTL_test.png")); # new image
 println("eQTL plot image test: ", @test img_test == img_ref);
 
 # clear new plot
-# rm(joinpath(@__DIR__, "eQTL_test.png"))
+rm(joinpath(@__DIR__, "eQTL_test.png"))
 # Helium.writehe(reshape(single_results.lod, :,1), joinpath(@__DIR__, "scan_test.he"))
 
 # testing plotting attributes
