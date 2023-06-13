@@ -14,10 +14,10 @@ module BigRiverQTLPlots
 
     # qtl functions
     include("./qtl/qtl_recipe.jl");
-    export qtlplot, QTLPlot  
+    export qtlplot, QTLPlot   
 
     include("./qtl/qtl_helpers.jl");
-    export plot_QTL, get_plot_QTL_inputs
+    export plot_QTL, plot_QTL!, get_plot_QTL_inputs
     
     
     # eqtl functions 

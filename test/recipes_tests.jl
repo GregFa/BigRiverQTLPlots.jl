@@ -1,76 +1,73 @@
 
 
-####################
-# Test eQTL Recipe #
-####################
+#############
+# Load Data #
+#############
 
 # load data 
 bulklmmdir = dirname(pathof(BulkLMM));
 
 gmap_file = joinpath(bulklmmdir, "..", "data", "bxdData", "gmap.csv");
 gInfo = BulkLMM.CSV.read(gmap_file, BulkLMM.DataFrames.DataFrame);
-
-# idx_geno = findall(occursin.(gInfo.Chr, "1 2 3 4 5"));
-# gInfo_subset = gInfo[idx_geno, :];
+idx_geno = findall(occursin.(gInfo.Chr, "1 2 3 4 5"));
+gInfo_subset = gInfo[idx_geno, :];
 
 phenocovar_file = joinpath(bulklmmdir, "..", "data", "bxdData", "phenocovar.csv");
 pInfo = BulkLMM.CSV.read(phenocovar_file, BulkLMM.DataFrames.DataFrame);
-# idx_pheno = findall(occursin.(pInfo.Chr, "1 2 3 4 5"));
-# pInfo_subset = pInfo[idx_pheno, :];
+idx_pheno = findall(occursin.(pInfo.Chr, "1 2 3 4 5"));
+pInfo_subset = pInfo[idx_pheno, :];
 
 pheno_file = joinpath(bulklmmdir, "..", "data", "bxdData", "spleen-pheno-nomissing.csv");
 pheno = BulkLMM.DelimitedFiles.readdlm(pheno_file, ',', header = false);
 pheno_processed = pheno[2:end, 2:(end-1)] .* 1.0; # exclude the header, the first (transcript ID)and the last columns (sex)
-
-# pheno_processed_subset = pheno_processed[:, idx_pheno];
+pheno_processed_subset = pheno_processed[:, idx_pheno];
 
 geno_file = joinpath(bulklmmdir, "..", "data", "bxdData", "spleen-bxd-genoprob.csv")
 geno = BulkLMM.DelimitedFiles.readdlm(geno_file, ',', header = false);
 geno_processed = geno[2:end, 1:2:end] .* 1.0;
+geno_processed_subset = geno_processed[:, idx_geno];
 
-X = geno_processed.-0.5;
-Y = 2 .* (X*X')./size(X,2) .+ 0.5;
-Y[BulkLMM.LinearAlgebra.diagind(Y)] .= 1.0
+####################
+# Test eQTL Recipe #
+####################
 
-Helium.writehe(Y, joinpath(@__DIR__, "Y_test.he"))
+# Kinship 
+kinship_subset = calcKinship(geno_processed_subset);
 
-# geno_processed_subset = geno_processed[:, idx_geno];
+# Scan
+multipletraits_results, heritability_results = bulkscan_null(
+	pheno_processed_subset,
+	geno_processed_subset,
+	kinship_subset,
+);
 
-# kinship_subset = calcKinship(geno_processed_subset);
+# use get_eQTL_accMb to get eQTL plotting inputs
+x, y, z, mysteps, mychr = BigRiverQTLPlots.get_eQTL_accMb(
+	multipletraits_results,
+	pInfo_subset,
+	gInfo_subset;
+	threshold = 5.0,
+);
 
+# generate plotting and save image as png to compare with the reference image 
+plot_eQTL(multipletraits_results, pInfo_subset, gInfo_subset; threshold = 5.0)
+savefig(joinpath(@__DIR__, "eQTL_test.png"))
 
-# multipletraits_results, heritability_results = bulkscan_null(
-# 	pheno_processed_subset,
-# 	geno_processed_subset,
-# 	kinship_subset,
-# );
+img_ref = FileIO.load(joinpath(@__DIR__, "..", "images", "eQTL_example.png")); # ref image
+img_test = FileIO.load(joinpath(@__DIR__, "eQTL_test.png")); # new image
 
-# # use get_eQTL_accMb to get eQTL plotting inputs
-# x, y, z, mysteps, mychr = BigRiverQTLPlots.get_eQTL_accMb(
-# 	multipletraits_results,
-# 	pInfo_subset,
-# 	gInfo_subset;
-# 	threshold = 5.0,
-# );
+# test plotting results
+println("eQTL plot image test: ", @test img_test == img_ref);
 
-# # generate plotting and save image as png to compare with the reference image 
-# plot_eQTL(multipletraits_results, pInfo_subset, gInfo_subset; threshold = 5.0)
-# savefig(joinpath(@__DIR__, "eQTL_new.png"))
+# clear new plot
+# rm(joinpath(@__DIR__, "eQTL_test.png"))
+# Helium.writehe(reshape(single_results.lod, :,1), joinpath(@__DIR__, "scan_test.he"))
 
-# img_test = FileIO.load(joinpath(@__DIR__, "..", "images", "eQTL_test.png")); # ref image
-# img_new = FileIO.load(joinpath(@__DIR__, "eQTL_new.png")); # new image
-
-# # test plotting results
-# println("eQTL plot image test: ", @test img_test == img_new);
-
-# # clear new plot
-# # rm(joinpath(@__DIR__, "eQTL_new.png"))
-
-# # testing plotting attributes
-# plot_obj = eqtlplot(x, y, z, mysteps, mychr);
-# println("eQTL plot attributes :x test: ", @test plot_obj[1][3].plotattributes[:x] == x);
-# println("eQTL plot attributes :y test: ", @test plot_obj[1][3].plotattributes[:y] == y);
-# println("eQTL plot attributes :z test: ", @test plot_obj[1][3].plotattributes[:marker_z] == z);
+# testing plotting attributes
+plot_obj = eqtlplot(x, y, z, mysteps, mychr);
+println("eQTL plot attributes :x test: ", @test plot_obj[1][3].plotattributes[:x] == x);
+println("eQTL plot attributes :y test: ", @test plot_obj[1][3].plotattributes[:y] == y);
+println("eQTL plot attributes :z test: ", @test plot_obj[1][3].plotattributes[:marker_z] == z);
 
 
 ###################
@@ -81,9 +78,8 @@ Helium.writehe(Y, joinpath(@__DIR__, "Y_test.he"))
 traitID = 1112;
 pheno_y = reshape(pheno_processed[:, traitID], :, 1);
 
-kinship =Y # calcKinship(geno_processed);
-Helium.writehe(kinship, joinpath(@__DIR__, "K_test.he"))
-
+# Kinship 
+kinship = calcKinship(geno_processed);
 
 # Scan 
 single_results_perms = scan(
@@ -94,15 +90,12 @@ single_results_perms = scan(
 	nperms = 2000,
 );
 
-Helium.writehe(single_results_perms.L_perms, joinpath(@__DIR__, "scan_perms.he"))
-
 single_results = scan(
 	pheno_y,
 	geno_processed,
 	kinship,
 );
 
-Helium.writehe(reshape(single_results.lod, :,1), joinpath(@__DIR__, "scan_test.he"))
 
 x, y, vecSteps, v_chr_names = get_plot_QTL_inputs(single_results.lod, gInfo);
 
@@ -129,11 +122,8 @@ img_thrs_test_2 = FileIO.load(joinpath(@__DIR__, "QTL_thrs_test_2.png")); # new 
 
 # test plotting results
 println("QTL plot image test: ", @test (img_test == img_ref));
-# println("QTL plot image test2: ", @test (sum(img_test .== img_new) == size(img_new,1)*size(img_new,2)));
 println("QTL plot image with thresholds (auto) test: ", @test img_thrs_test_1 == img_thrs_ref);
 println("QTL plot image with thresholds (manual) test: ", @test img_thrs_test_2 == img_thrs_ref);
-# println("QTL plot image test2: ", 
-# 	@test (sum(img_thrs_test .== img_thrs_new) == size(img_thrs_new,1)*size(img_thrs_new,2)));
 
 # clear new plot
 rm(joinpath(@__DIR__, "QTL_test.png"))
@@ -150,12 +140,3 @@ println("QTL plot attributes :x test: ",
 idx_not_Inf = findall(y .!= Inf);
 println("QTL plot attributes :y test: ", 
 			@test plot_obj[1][3].plotattributes[:y][idx_not_Inf] == y[idx_not_Inf]);
-
-
-
-
-
-# thrs = BigRiverQTLPlots.perms_thresholds(
-# 	single_results_perms, [0.90, 0.95]);
-# mthrs = thrs|> permutedims;
-# Helium.writehe(mthrs, joinpath(@__DIR__, "thrs_test.he"))

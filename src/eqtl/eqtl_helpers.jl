@@ -139,6 +139,6 @@ function plot_eQTL(multiLODs::Array{Float64, 2}, dfpInfo::DataFrame, dfgInfo::Da
                         kwargs...
                     )
 
-    eqtlplot(x, y, z, mysteps, mychr, kwargs...)
+    eqtlplot(x, y, z, mysteps, mychr; kwargs...)
 
 end

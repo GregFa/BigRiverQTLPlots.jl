@@ -37,7 +37,7 @@
 
 
     # set a default value for an attribute with `-->`
-    xlabel --> "Chromosome"
+    xlabel --> "Locus (Chromosome)"
     ylabel --> "LOD score"
     
     marker --> 6
@@ -52,7 +52,7 @@
     # size --> (650, 550)
         
     # set up the subplots
-    legend := false
+    legend --> false
     link := :both
     # framestyle := [:none :axes :none]
     # yaxis := false 
