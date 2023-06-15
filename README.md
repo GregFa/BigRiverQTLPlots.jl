@@ -45,7 +45,7 @@ plot_eQTL(multipletraits_results, pInfo, gInfo; threshold = 5.0)
 Contributions to BigRiverQTLPlots.jl are welcome and appreciated. If you'd like to contribute, please fork the repository and make changes as you'd like. If you have any questions or issues, feel free to open an issue on the repository.
 
 ## License
-`BigRiverQTLPlots.jl` is licensed under the MIT license. For more information, please refer to the LICENSE file in the repository.
+`BigRiverQTLPlots.jl` is licensed under the [GNU AFFERO GENERAL PUBLIC LICENSE](LICENSE). For more information, please refer to the LICENSE file in the repository.
 
 ## Support
 If you have any problems or questions using `BigRiverQTLPlots.jl`, please open an issue on the GitHub repository. We'll be happy to help!
