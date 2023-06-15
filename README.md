@@ -38,11 +38,7 @@ plot_QTL(single_results_perms, gInfo)
 # gInfo contains genotype information  
 # thresh is your LOD threshold value
 plot_eQTL(multipletraits_results, pInfo, gInfo; threshold = 5.0)
-plot_QTL(single_results_perms, gInfo)
 
-
-# Assuming `confidence_data` is your data
-confplot(confidence_data)
 ```
 
 ## Contribution

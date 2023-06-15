@@ -216,9 +216,9 @@ function plot_QTL(vLOD::Vector{<: AbstractFloat}, dfgInfo::DataFrame;
 		chrColname = chrColname, mbColname = mbColname)
 
 	if isempty(thresholds)
-		qtlplot(x, y, vecSteps, v_chr_names, kwargs...)
+		qtlplot(x, y, vecSteps, v_chr_names; kwargs...)
 	else
-		qtlplot(x, y, vecSteps, v_chr_names, thresholds, kwargs...)
+		qtlplot(x, y, vecSteps, v_chr_names, thresholds; kwargs...)
 	end
 
 end
@@ -234,6 +234,41 @@ function plot_QTL(scanresult::NamedTuple, dfgInfo::DataFrame;
 	end
 
 	plot_QTL(
+		scanresult.lod, dfgInfo;
+		chrColname = chrColname,
+		mbColname = mbColname,
+		thresholds = thrshlds,
+		kwargs...,
+	)
+
+end
+
+function plot_QTL!(vLOD::Vector{<: AbstractFloat}, dfgInfo::DataFrame;
+	chrColname::String = "Chr", mbColname::String = "Mb",
+	thresholds::Vector = [], kwargs...)
+
+	x, y, vecSteps, v_chr_names = get_plot_QTL_inputs(vLOD, dfgInfo;
+		chrColname = chrColname, mbColname = mbColname)
+
+	if isempty(thresholds)
+		qtlplot!(x, y, vecSteps, v_chr_names; kwargs...)
+	else
+		qtlplot!(x, y, vecSteps, v_chr_names, thresholds; kwargs...)
+	end
+
+end
+
+function plot_QTL!(scanresult::NamedTuple, dfgInfo::DataFrame;
+	chrColname::String = "Chr", mbColname::String = "Mb",
+	thresholds::Vector = [], kwargs...)
+
+	if (:L_perms in keys(scanresult))
+		thrshlds = perms_thresholds(scanresult.L_perms, thresholds)
+	else
+		thrshlds = thresholds
+	end
+
+	plot_QTL!(
 		scanresult.lod, dfgInfo;
 		chrColname = chrColname,
 		mbColname = mbColname,
