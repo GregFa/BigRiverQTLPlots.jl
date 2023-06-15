@@ -1,11 +1,8 @@
 module BigRiverQTLPlots
 
     # dependent packages 
-    using DataFrames, Statistics, Helium
+    using DataFrames, Statistics
     using RecipesBase
-    # using CSV, DelimitedFiles, Missings 
-    # using LinearAlgebra, Statistics, Optim
-    # using Random, Distributions
     
     # utils functions
     include("utils.jl");
