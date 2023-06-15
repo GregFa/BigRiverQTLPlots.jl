@@ -43,15 +43,16 @@ kinship = calcKinship(geno_processed);
 ########
 # Scan #
 ########
-single_results_perms = scan(
+
+@time single_results_perms = scan(
 	pheno_y,
 	geno_processed,
 	kinship;
 	permutation_test = true,
-	nperms = 2000,
+	nperms = 1000,
 );
 
-single_results = scan(
+@time single_results = scan(
 	pheno_y,
 	geno_processed,
 	kinship,
