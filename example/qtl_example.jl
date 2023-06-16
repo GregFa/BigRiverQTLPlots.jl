@@ -3,7 +3,7 @@ using BigRiverQTLPlots
 using BulkLMM
 using Random, Statistics
 using Plots
-using Helium
+
 
 ##############
 # BXD spleen #
@@ -31,7 +31,6 @@ geno_processed = geno[2:end, 1:2:end] .* 1.0;
 #################
 # Preprocessing #
 #################
-
 traitID = 1112;
 pheno_y = reshape(pheno_processed[:, traitID], :, 1);
 
@@ -39,6 +38,7 @@ pheno_y = reshape(pheno_processed[:, traitID], :, 1);
 # Kinship #
 ###########
 kinship = calcKinship(geno_processed);
+kinship = round.(kinship, digits = 12);
 
 ########
 # Scan #
@@ -58,7 +58,7 @@ kinship = calcKinship(geno_processed);
 	kinship,
 );
 
-
+thrs = BigRiverQTLPlots.perms_thresholds(single_results_perms.L_perms, [0.90, 0.95]);
 ########
 # Plot #
 ########
@@ -68,31 +68,3 @@ savefig(joinpath(@__DIR__, "..", "images", "QTL_example.png"))
 plot_QTL(single_results_perms, gInfo, thresholds = [0.90, 0.95])
 savefig(joinpath(@__DIR__, "..", "images", "QTL_thrs_example.png"))
 
-
-
-
-
-
-
-
-gemma_results_path = joinpath(bulklmmdir,"..","data/bxdData/GEMMA_BXDTrait1112/gemma_lod_1112.txt")
-Lod_gemma = BulkLMM.DelimitedFiles.readdlm(gemma_results_path, '\t');
-
-traitName = pInfo[traitID, 1] # get the trait name of the 1112-th trait
-
-plot_QTL(
-	single_results_perms, 
-	gInfo, 
-	thresholds = [0.90, 0.95],
-	legend = true,
-	label = "BulkLMM.jl",
-	title = "Single trait $traitName LOD scores"
-)
-plot_QTL!(
-	vec(Lod_gemma), 
-	gInfo, 
-	linecolor = :purple, 
-	label = "GEMMA", 
-	legend = :topright
-)
-savefig(joinpath(@__DIR__, "..", "images", "QTL_example.svg"))
