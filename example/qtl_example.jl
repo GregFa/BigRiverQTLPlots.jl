@@ -3,7 +3,7 @@ using BigRiverQTLPlots
 using BulkLMM
 using Random, Statistics
 using Plots
-
+using Helium
 
 ##############
 # BXD spleen #
@@ -38,7 +38,6 @@ pheno_y = reshape(pheno_processed[:, traitID], :, 1);
 # Kinship #
 ###########
 kinship = calcKinship(geno_processed);
-kinship = round.(kinship, digits = 12);
 
 ########
 # Scan #
@@ -59,6 +58,7 @@ kinship = round.(kinship, digits = 12);
 );
 
 thrs = BigRiverQTLPlots.perms_thresholds(single_results_perms.L_perms, [0.90, 0.95]);
+Helium.writehe(reshape(thrs, :, 1), joinpath(@__DIR__, "..", "test", "thresholds.he"))
 ########
 # Plot #
 ########
