@@ -57,7 +57,7 @@ kinship = calcKinship(geno_processed);
 	kinship,
 );
 
-thrs = BigRiverQTLPlots.perms_thresholds(single_results_perms.L_perms, [0.90, 0.95]);
+thrs = BigRiverQTLPlots.perms_thresholds(single_results_perms.L_perms, [0.10, 0.05]);
 Helium.writehe(reshape(thrs, :, 1), joinpath(@__DIR__, "..", "test", "thresholds.he"))
 ########
 # Plot #
@@ -65,6 +65,6 @@ Helium.writehe(reshape(thrs, :, 1), joinpath(@__DIR__, "..", "test", "thresholds
 plot_QTL(single_results.lod, gInfo)
 savefig(joinpath(@__DIR__, "..", "images", "QTL_example.png"))
 
-plot_QTL(single_results_perms, gInfo, thresholds = [0.90, 0.95])
+plot_QTL(single_results_perms, gInfo, significance = [0.10, 0.05])
 savefig(joinpath(@__DIR__, "..", "images", "QTL_thrs_example.png"))
 

@@ -31,115 +31,116 @@ geno_processed_subset = geno_processed[:, idx_geno];
 # Test eQTL Recipe #
 ####################
 
-# # Kinship 
-# kinship_subset = calcKinship(geno_processed_subset);
+# Kinship 
+kinship_subset = calcKinship(geno_processed_subset);
 
-# # Scan
-# multipletraits_results, heritability_results = bulkscan_null(
-# 	pheno_processed_subset,
-# 	geno_processed_subset,
-# 	kinship_subset,
-# );
+# Scan
+multipletraits_results, heritability_results = bulkscan_null(
+	pheno_processed_subset,
+	geno_processed_subset,
+	kinship_subset,
+);
 
-# # use get_eQTL_accMb to get eQTL plotting inputs
-# x, y, z, mysteps, mychr = BigRiverQTLPlots.get_eQTL_accMb(
-# 	multipletraits_results,
-# 	pInfo_subset,
-# 	gInfo_subset;
-# 	threshold = 5.0,
-# );
+# use get_eQTL_accMb to get eQTL plotting inputs
+x, y, z, mysteps, mychr = BigRiverQTLPlots.get_eQTL_accMb(
+	multipletraits_results,
+	pInfo_subset,
+	gInfo_subset;
+	threshold = 5.0,
+);
 
-# # generate plotting and save image as png to compare with the reference image 
-# plot_eQTL(multipletraits_results, pInfo_subset, gInfo_subset; threshold = 5.0)
-# savefig(joinpath(@__DIR__, "eQTL_test.png"))
+# generate plotting and save image as png to compare with the reference image 
+plot_eQTL(multipletraits_results, pInfo_subset, gInfo_subset; threshold = 5.0)
+savefig(joinpath(@__DIR__, "eQTL_test.png"))
 
-# img_ref = FileIO.load(joinpath(@__DIR__, "..", "images", "eQTL_example.png")); # ref image
-# img_test = FileIO.load(joinpath(@__DIR__, "eQTL_test.png")); # new image
+img_ref = FileIO.load(joinpath(@__DIR__, "..", "images", "eQTL_example.png")); # ref image
+img_test = FileIO.load(joinpath(@__DIR__, "eQTL_test.png")); # new image
 
-# # test plotting results
-# println("eQTL plot image test: ", @test img_test == img_ref);
+# test plotting results
+println("eQTL plot image test: ", @test img_test == img_ref);
 
-# # clear new plot
+# clear new plot
 # rm(joinpath(@__DIR__, "eQTL_test.png"))
 
-# # testing plotting attributes
-# plot_obj = eqtlplot(x, y, z, mysteps, mychr);
-# println("eQTL plot attributes :x test: ", @test plot_obj[1][3].plotattributes[:x] == x);
-# println("eQTL plot attributes :y test: ", @test plot_obj[1][3].plotattributes[:y] == y);
-# println("eQTL plot attributes :z test: ", @test plot_obj[1][3].plotattributes[:marker_z] == z);
+# testing plotting attributes
+plot_obj = eqtlplot(x, y, z, mysteps, mychr);
+println("eQTL plot attributes :x test: ", @test plot_obj[1][3].plotattributes[:x] == x);
+println("eQTL plot attributes :y test: ", @test plot_obj[1][3].plotattributes[:y] == y);
+println("eQTL plot attributes :z test: ", @test plot_obj[1][3].plotattributes[:marker_z] == z);
 
 
 ###################
 # Test QTL Recipe #
 ###################
 
-# Preprocessing 
-traitID = 1112;
-pheno_y = reshape(pheno_processed[:, traitID], :, 1);
+# # Preprocessing 
+# traitID = 1112;
+# pheno_y = reshape(pheno_processed[:, traitID], :, 1);
 
-# Kinship 
-kinship = calcKinship(geno_processed);
+# # Kinship 
+# kinship = calcKinship(geno_processed);
 
-# Scan 
-single_results_perms = scan(
-	pheno_y,
-	geno_processed,
-	kinship;
-	permutation_test = true,
-	nperms = 1000,
-);
+# # Scan 
+# single_results_perms = scan(
+# 	pheno_y,
+# 	geno_processed,
+# 	kinship;
+# 	permutation_test = true,
+# 	nperms = 1000,
+# );
 
-single_results = scan(
-	pheno_y,
-	geno_processed,
-	kinship,
-);
-
-
-x, y, vecSteps, v_chr_names = get_plot_QTL_inputs(single_results.lod, gInfo);
-
-# generate plotting and save image as png to compare with the reference image 
-plot_QTL(single_results.lod, gInfo);
-savefig(joinpath(@__DIR__, "QTL_test.png"));
-
-# generate plotting with thresholds obtain from perms_thresholds()
-plot_QTL(single_results_perms, gInfo, thresholds = [0.90, 0.95]);
-savefig(joinpath(@__DIR__, "QTL_thrs_test_1.png"));
-
-# generate plotting with manual thresholds
-thrs = BigRiverQTLPlots.perms_thresholds(single_results_perms.L_perms, [0.90, 0.95]);
-# thrs = Helium.readhe(joinpath(@__DIR__, "thresholds.he"))[:,1];
-println(thrs)
-plot_QTL(single_results_perms.lod, gInfo, thresholds = thrs);
-savefig(joinpath(@__DIR__, "QTL_thrs_test_2.png"));
+# single_results = scan(
+# 	pheno_y,
+# 	geno_processed,
+# 	kinship,
+# );
 
 
-img_ref = FileIO.load(joinpath(@__DIR__, "..", "images", "QTL_example.png")); # ref image
-img_thrs_ref = FileIO.load(joinpath(@__DIR__, "..", "images", "QTL_thrs_example.png")); # ref image with thresholds
+# x, y, vecSteps, v_chr_names = get_plot_QTL_inputs(single_results.lod, gInfo);
 
-img_test = FileIO.load(joinpath(@__DIR__, "QTL_test.png")); # new image
-img_thrs_test_1 = FileIO.load(joinpath(@__DIR__, "QTL_thrs_test_1.png")); # new image with thresholds
-img_thrs_test_2 = FileIO.load(joinpath(@__DIR__, "QTL_thrs_test_2.png")); # new image with thresholds
+# # generate plotting and save image as png to compare with the reference image 
+# plot_QTL(single_results.lod, gInfo);
+# savefig(joinpath(@__DIR__, "QTL_test.png"));
 
-# test plotting results
-println("QTL plot image test: ", @test (img_test == img_ref));
-println("QTL plot image with thresholds (auto) test: ", 
-@test sum(1 .*(img_thrs_test_1 .== img_thrs_ref))==size(img_thrs_ref,1)*size(img_thrs_ref,2));
-println("QTL plot image with thresholds (auto) test: ", @test img_thrs_test_1 == img_thrs_ref);
-println("QTL plot image with thresholds (manual vs auto) test: ", @test img_thrs_test_2 == img_thrs_test_1);
+# # generate test plotting with thresholds obtain from perms_thresholds()
+# plot_QTL(single_results_perms, gInfo, significance = [0.10, 0.05]);
+# savefig(joinpath(@__DIR__, "QTL_thrs_test_1.png"));
 
-# clear new plot
-rm(joinpath(@__DIR__, "QTL_test.png"))
-# rm(joinpath(@__DIR__, "QTL_thrs_test_1.png"))
-# rm(joinpath(@__DIR__, "QTL_thrs_test_2.png"))
+# # generate test plotting with manual thresholds
+# thrs = BigRiverQTLPlots.perms_thresholds(single_results_perms.L_perms, [0.10, 0.05]);
+# # thrs = Helium.readhe(joinpath(@__DIR__, "thresholds.he"))[:,1];
+# println(thrs)
+# plot_QTL(single_results_perms.lod, gInfo, thresholds = thrs);
+# savefig(joinpath(@__DIR__, "QTL_thrs_test_2.png"));
+
+# # load references images
+# img_ref = FileIO.load(joinpath(@__DIR__, "..", "images", "QTL_example.png")); # ref image
+# img_thrs_ref = FileIO.load(joinpath(@__DIR__, "..", "images", "QTL_thrs_example.png")); # ref image with thresholds
+
+# # load test images
+# img_test = FileIO.load(joinpath(@__DIR__, "QTL_test.png")); # new image
+# img_thrs_test_1 = FileIO.load(joinpath(@__DIR__, "QTL_thrs_test_1.png")); # new image with thresholds
+# img_thrs_test_2 = FileIO.load(joinpath(@__DIR__, "QTL_thrs_test_2.png")); # new image with thresholds
+
+# # test plotting results
+# println("QTL plot image test: ", @test (img_test == img_ref));
+# println("QTL plot image with thresholds (auto) test: ", 
+# @test sum(1 .*(img_thrs_test_1 .== img_thrs_ref))==size(img_thrs_ref,1)*size(img_thrs_ref,2));
+# println("QTL plot image with thresholds (auto) test: ", @test img_thrs_test_1 == img_thrs_ref);
+# println("QTL plot image with thresholds (manual vs auto) test: ", @test img_thrs_test_2 == img_thrs_test_1);
+
+# # clear new plot
+# rm(joinpath(@__DIR__, "QTL_test.png"))
+# # rm(joinpath(@__DIR__, "QTL_thrs_test_1.png"))
+# # rm(joinpath(@__DIR__, "QTL_thrs_test_2.png"))
 
 
-# testing plotting attributes
-plot_obj = qtlplot(x, y, vecSteps, v_chr_names, thrs);
+# # testing plotting attributes
+# plot_obj = qtlplot(x, y, vecSteps, v_chr_names, thrs);
 
-idx_not_Inf = findall(x .!= Inf);
-println("QTL plot attributes :x test: ", 
-			@test plot_obj[1][3].plotattributes[:x][idx_not_Inf] == x[idx_not_Inf]);
-idx_not_Inf = findall(y .!= Inf);
-println("QTL plot attributes :y test: ", 
-			@test plot_obj[1][3].plotattributes[:y][idx_not_Inf] == y[idx_not_Inf]);
+# idx_not_Inf = findall(x .!= Inf);
+# println("QTL plot attributes :x test: ", 
+# 			@test plot_obj[1][3].plotattributes[:x][idx_not_Inf] == x[idx_not_Inf]);
+# idx_not_Inf = findall(y .!= Inf);
+# println("QTL plot attributes :y test: ", 
+# 			@test plot_obj[1][3].plotattributes[:y][idx_not_Inf] == y[idx_not_Inf]);
