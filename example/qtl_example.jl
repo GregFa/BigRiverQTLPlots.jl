@@ -58,7 +58,7 @@ single_results = scan(
 );
 
 thrs = BigRiverQTLPlots.perms_thresholds(single_results_perms.L_perms, [0.10, 0.05]);
-# Helium.writehe(reshape(thrs, :, 1), joinpath(@__DIR__, "..", "test", "thresholds.he"))
+Helium.writehe(reshape(thrs, :, 1), joinpath(@__DIR__, "..", "test", "data", "thresholds.he"))
 ########
 # Plot #
 ########
