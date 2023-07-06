@@ -42,7 +42,7 @@ function perms_thresholds(mLOD::Matrix{<: AbstractFloat}, significance::Vector =
 	max_lods = vec(mapslices(x -> maximum(x), mLOD; dims = 1))
 
 	# get LOD values corresponding significances values
-	thresholds_lod = map(x -> quantile(max_lods, x), 1 .- thresholds)
+	thresholds_lod = map(x -> quantile(max_lods, x), 1 .- significance)
 
 	return thresholds_lod
 end

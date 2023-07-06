@@ -43,7 +43,7 @@ kinship = calcKinship(geno_processed);
 # Scan #
 ########
 
-@time single_results_perms = scan(
+single_results_perms = scan(
 	pheno_y,
 	geno_processed,
 	kinship;
@@ -51,14 +51,14 @@ kinship = calcKinship(geno_processed);
 	nperms = 1000,
 );
 
-@time single_results = scan(
+single_results = scan(
 	pheno_y,
 	geno_processed,
 	kinship,
 );
 
 thrs = BigRiverQTLPlots.perms_thresholds(single_results_perms.L_perms, [0.10, 0.05]);
-Helium.writehe(reshape(thrs, :, 1), joinpath(@__DIR__, "..", "test", "thresholds.he"))
+# Helium.writehe(reshape(thrs, :, 1), joinpath(@__DIR__, "..", "test", "thresholds.he"))
 ########
 # Plot #
 ########

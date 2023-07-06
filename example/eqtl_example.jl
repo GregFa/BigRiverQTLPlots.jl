@@ -14,12 +14,12 @@ bulklmmdir = dirname(pathof(BulkLMM));
 
 gmap_file = joinpath(bulklmmdir, "..", "data", "bxdData", "gmap.csv");
 gInfo = BulkLMM.CSV.read(gmap_file, BulkLMM.DataFrames.DataFrame);
-idx_geno = findall(occursin.(gInfo.Chr, "1 2 3 4 5"));
+idx_geno = findall(occursin.(gInfo.Chr, "1 2 3"));
 gInfo_subset = gInfo[idx_geno, :];
 
 phenocovar_file = joinpath(bulklmmdir, "..", "data", "bxdData", "phenocovar.csv");
 pInfo = BulkLMM.CSV.read(phenocovar_file, BulkLMM.DataFrames.DataFrame);
-idx_pheno = findall(occursin.(pInfo.Chr, "1 2 3 4 5"));
+idx_pheno = findall(occursin.(pInfo.Chr, "1 2 3"));
 pInfo_subset = pInfo[idx_pheno, :];
 
 pheno_file = joinpath(bulklmmdir, "..", "data", "bxdData", "spleen-pheno-nomissing.csv");
@@ -41,19 +41,17 @@ kinship_subset = calcKinship(geno_processed_subset);
 ########
 # Scan #
 ########
-multipletraits_results, heritability_results = bulkscan_null(
-	pheno_processed_subset,
-	geno_processed_subset,
-	kinship_subset,
-)
-
-# results_path = joinpath(@__DIR__, "..", "data", "multipletraits_results.he")
-# if isfile(results_path)
-# 	multipletraits_results = Helium.readhe(results_path)
-# else
-# 	multipletraits_results, heritability_results = bulkscan_null(pheno_processed, geno_processed, kinship)
-# 	Helium.writehe(multipletraits_results, results_path)
-# end
+results_path = joinpath(@__DIR__, "..", "test", "data", "multipletraits_results.he")
+if isfile(results_path)
+	multipletraits_results = Helium.readhe(results_path)
+else
+	multipletraits_results, heritability_results = bulkscan_null(
+		pheno_processed_subset,
+		geno_processed_subset,
+		kinship_subset,
+	)
+	Helium.writehe(multipletraits_results, results_path)
+end
 
 ########
 # Plot #
