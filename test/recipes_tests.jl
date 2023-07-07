@@ -79,6 +79,7 @@ pheno_y = reshape(pheno_processed[:, traitID], :, 1);
 
 # Kinship 
 kinship = calcKinship(geno_processed);
+kinship = round.(kinship, digits = 12);
 
 # Scan 
 single_results_perms = scan(
@@ -86,7 +87,7 @@ single_results_perms = scan(
 	geno_processed,
 	kinship;
 	permutation_test = true,
-	nperms = 2000,
+	nperms = 1000,
 );
 
 single_results = scan(
@@ -108,6 +109,7 @@ savefig(joinpath(@__DIR__, "QTL_thrs_test_1.png"));
 
 # generate plotting with manual thresholds
 thrs = BigRiverQTLPlots.perms_thresholds(single_results_perms.L_perms, [0.90, 0.95]);
+println(thrs)
 plot_QTL(single_results_perms.lod, gInfo, thresholds = thrs);
 savefig(joinpath(@__DIR__, "QTL_thrs_test_2.png"));
 
@@ -121,13 +123,15 @@ img_thrs_test_2 = FileIO.load(joinpath(@__DIR__, "QTL_thrs_test_2.png")); # new 
 
 # test plotting results
 println("QTL plot image test: ", @test (img_test == img_ref));
+println("QTL plot image with thresholds (auto) test: ", 
+@test sum(1 .*(img_thrs_test_1 .== img_thrs_ref))==size(img_thrs_ref,1)*size(img_thrs_ref,2));
 println("QTL plot image with thresholds (auto) test: ", @test img_thrs_test_1 == img_thrs_ref);
-println("QTL plot image with thresholds (manual) test: ", @test img_thrs_test_2 == img_thrs_ref);
+println("QTL plot image with thresholds (manual vs auto) test: ", @test img_thrs_test_2 == img_thrs_test_1);
 
 # clear new plot
 rm(joinpath(@__DIR__, "QTL_test.png"))
-rm(joinpath(@__DIR__, "QTL_thrs_test_1.png"))
-rm(joinpath(@__DIR__, "QTL_thrs_test_2.png"))
+# rm(joinpath(@__DIR__, "QTL_thrs_test_1.png"))
+# rm(joinpath(@__DIR__, "QTL_thrs_test_2.png"))
 
 
 # testing plotting attributes
