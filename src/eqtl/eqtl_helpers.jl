@@ -59,7 +59,7 @@ function get_eQTL_accMb(multiLODs::Matrix{Float64}, dfpInfo::DataFrame, dfgInfo:
 
     # get a copy of genotype info dataframe
     gmap = copy(dfgInfo) 
-    gmap.acc_geno_mb .= gmap[!, mbColname]
+    gmap[!, :acc_geno_mb] = gmap[!, mbColname]
     rename!(gmap, Dict(Symbol(mbColname) => :geno_mb));
     rename!(gmap, Dict(Symbol(chrColname) => :geno_chr)); 
     

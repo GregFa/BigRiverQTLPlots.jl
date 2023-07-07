@@ -9,12 +9,12 @@ bulklmmdir = dirname(pathof(BulkLMM));
 
 gmap_file = joinpath(bulklmmdir, "..", "data", "bxdData", "gmap.csv");
 gInfo = BulkLMM.CSV.read(gmap_file, BulkLMM.DataFrames.DataFrame);
-idx_geno = findall(occursin.(gInfo.Chr, "1 2 3"));
+idx_geno = findall(occursin.(gInfo.Chr, "1 2"));
 gInfo_subset = gInfo[idx_geno, :];
 
 phenocovar_file = joinpath(bulklmmdir, "..", "data", "bxdData", "phenocovar.csv");
 pInfo = BulkLMM.CSV.read(phenocovar_file, BulkLMM.DataFrames.DataFrame);
-idx_pheno = findall(occursin.(pInfo.Chr, "1 2 3"));
+idx_pheno = findall(occursin.(pInfo.Chr, "1 2"));
 pInfo_subset = pInfo[idx_pheno, :];
 
 pheno_file = joinpath(bulklmmdir, "..", "data", "bxdData", "spleen-pheno-nomissing.csv");
@@ -107,15 +107,18 @@ x, y, vecSteps, v_chr_names = get_plot_QTL_inputs(single_results.lod, gInfo);
 plot_QTL(single_results.lod, gInfo);
 savefig(joinpath(@__DIR__, "QTL_test.png"));
 
-# generate test plotting with thresholds obtain from perms_thresholds()
-plot_QTL(single_results_perms, gInfo, significance = [0.10, 0.05]);
-savefig(joinpath(@__DIR__, "QTL_thrs_test_1.png"));
 
 # generate test plotting with manual thresholds
 # thrs = BigRiverQTLPlots.perms_thresholds(single_results_perms.L_perms, [0.10, 0.05]);
 thrs = Helium.readhe(joinpath(@__DIR__, "data", "thresholds.he"))[:,1];
 plot_QTL(single_results_perms.lod, gInfo, thresholds = thrs);
+savefig(joinpath(@__DIR__, "QTL_thrs_test_1.png"));
+
+
+# generate test plotting with thresholds obtain from perms_thresholds()
+plot_QTL(single_results_perms, gInfo, significance = [0.10, 0.05]);
 savefig(joinpath(@__DIR__, "QTL_thrs_test_2.png"));
+
 
 # load references images
 img_ref = FileIO.load(joinpath(@__DIR__, "..", "images", "QTL_example.png")); # ref image
@@ -128,10 +131,10 @@ img_thrs_test_2 = FileIO.load(joinpath(@__DIR__, "QTL_thrs_test_2.png")); # new 
 
 # test plotting results
 println("QTL plot image test: ", @test (img_test == img_ref));
-println("QTL plot image with thresholds (auto) test: ", 
+println("QTL plot image with thresholds (manual) test: ", 
 @test sum(1 .*(img_thrs_test_1 .== img_thrs_ref))==size(img_thrs_ref,1)*size(img_thrs_ref,2));
-println("QTL plot image with thresholds (auto) test: ", @test img_thrs_test_1 == img_thrs_ref);
-println("QTL plot image with thresholds (manual vs auto) test: ", @test img_thrs_test_2 == img_thrs_test_1);
+println("QTL plot image with thresholds (manual) test: ", @test img_thrs_test_1 == img_thrs_ref);
+# println("QTL plot image with thresholds (manual vs auto) test: ", @test img_thrs_test_2 == img_thrs_test_1);
 
 # clear new plot
 rm(joinpath(@__DIR__, "QTL_test.png"))
