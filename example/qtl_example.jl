@@ -3,7 +3,7 @@ using BigRiverQTLPlots
 using BulkLMM
 using Random, Statistics
 using Plots
-
+using Helium
 
 ##############
 # BXD spleen #
@@ -38,13 +38,12 @@ pheno_y = reshape(pheno_processed[:, traitID], :, 1);
 # Kinship #
 ###########
 kinship = calcKinship(geno_processed);
-kinship = round.(kinship, digits = 12);
 
 ########
 # Scan #
 ########
 
-@time single_results_perms = scan(
+single_results_perms = scan(
 	pheno_y,
 	geno_processed,
 	kinship;
@@ -52,19 +51,20 @@ kinship = round.(kinship, digits = 12);
 	nperms = 1000,
 );
 
-@time single_results = scan(
+single_results = scan(
 	pheno_y,
 	geno_processed,
 	kinship,
 );
 
-thrs = BigRiverQTLPlots.perms_thresholds(single_results_perms.L_perms, [0.90, 0.95]);
+thrs = BigRiverQTLPlots.perms_thresholds(single_results_perms.L_perms, [0.10, 0.05]);
+Helium.writehe(reshape(thrs, :, 1), joinpath(@__DIR__, "..", "test", "data", "thresholds.he"))
 ########
 # Plot #
 ########
 plot_QTL(single_results.lod, gInfo)
 savefig(joinpath(@__DIR__, "..", "images", "QTL_example.png"))
 
-plot_QTL(single_results_perms, gInfo, thresholds = [0.90, 0.95])
+plot_QTL(single_results_perms, gInfo, significance = [0.10, 0.05])
 savefig(joinpath(@__DIR__, "..", "images", "QTL_thrs_example.png"))
 

@@ -9,12 +9,12 @@ bulklmmdir = dirname(pathof(BulkLMM));
 
 gmap_file = joinpath(bulklmmdir, "..", "data", "bxdData", "gmap.csv");
 gInfo = BulkLMM.CSV.read(gmap_file, BulkLMM.DataFrames.DataFrame);
-idx_geno = findall(occursin.(gInfo.Chr, "1 2 3 4 5"));
+idx_geno = findall(occursin.(gInfo.Chr, "1 2 3"));
 gInfo_subset = gInfo[idx_geno, :];
 
 phenocovar_file = joinpath(bulklmmdir, "..", "data", "bxdData", "phenocovar.csv");
 pInfo = BulkLMM.CSV.read(phenocovar_file, BulkLMM.DataFrames.DataFrame);
-idx_pheno = findall(occursin.(pInfo.Chr, "1 2 3 4 5"));
+idx_pheno = findall(occursin.(pInfo.Chr, "1 2 3"));
 pInfo_subset = pInfo[idx_pheno, :];
 
 pheno_file = joinpath(bulklmmdir, "..", "data", "bxdData", "spleen-pheno-nomissing.csv");
@@ -35,11 +35,16 @@ geno_processed_subset = geno_processed[:, idx_geno];
 kinship_subset = calcKinship(geno_processed_subset);
 
 # Scan
-multipletraits_results, heritability_results = bulkscan_null(
-	pheno_processed_subset,
-	geno_processed_subset,
-	kinship_subset,
-);
+results_path = joinpath(@__DIR__, "data", "multipletraits_results.he")
+if isfile(results_path)
+	multipletraits_results = Helium.readhe(results_path)
+else
+	multipletraits_results, heritability_results = bulkscan_null(
+		pheno_processed_subset,
+		geno_processed_subset,
+		kinship_subset,
+	)
+end
 
 # use get_eQTL_accMb to get eQTL plotting inputs
 x, y, z, mysteps, mychr = BigRiverQTLPlots.get_eQTL_accMb(
@@ -79,7 +84,6 @@ pheno_y = reshape(pheno_processed[:, traitID], :, 1);
 
 # Kinship 
 kinship = calcKinship(geno_processed);
-kinship = round.(kinship, digits = 12);
 
 # Scan 
 single_results_perms = scan(
@@ -103,20 +107,21 @@ x, y, vecSteps, v_chr_names = get_plot_QTL_inputs(single_results.lod, gInfo);
 plot_QTL(single_results.lod, gInfo);
 savefig(joinpath(@__DIR__, "QTL_test.png"));
 
-# generate plotting with thresholds obtain from perms_thresholds()
-plot_QTL(single_results_perms, gInfo, thresholds = [0.90, 0.95]);
+# generate test plotting with thresholds obtain from perms_thresholds()
+plot_QTL(single_results_perms, gInfo, significance = [0.10, 0.05]);
 savefig(joinpath(@__DIR__, "QTL_thrs_test_1.png"));
 
-# generate plotting with manual thresholds
-thrs = BigRiverQTLPlots.perms_thresholds(single_results_perms.L_perms, [0.90, 0.95]);
-println(thrs)
+# generate test plotting with manual thresholds
+# thrs = BigRiverQTLPlots.perms_thresholds(single_results_perms.L_perms, [0.10, 0.05]);
+thrs = Helium.readhe(joinpath(@__DIR__, "data", "thresholds.he"))[:,1];
 plot_QTL(single_results_perms.lod, gInfo, thresholds = thrs);
 savefig(joinpath(@__DIR__, "QTL_thrs_test_2.png"));
 
-
+# load references images
 img_ref = FileIO.load(joinpath(@__DIR__, "..", "images", "QTL_example.png")); # ref image
 img_thrs_ref = FileIO.load(joinpath(@__DIR__, "..", "images", "QTL_thrs_example.png")); # ref image with thresholds
 
+# load test images
 img_test = FileIO.load(joinpath(@__DIR__, "QTL_test.png")); # new image
 img_thrs_test_1 = FileIO.load(joinpath(@__DIR__, "QTL_thrs_test_1.png")); # new image with thresholds
 img_thrs_test_2 = FileIO.load(joinpath(@__DIR__, "QTL_thrs_test_2.png")); # new image with thresholds
@@ -130,8 +135,8 @@ println("QTL plot image with thresholds (manual vs auto) test: ", @test img_thrs
 
 # clear new plot
 rm(joinpath(@__DIR__, "QTL_test.png"))
-# rm(joinpath(@__DIR__, "QTL_thrs_test_1.png"))
-# rm(joinpath(@__DIR__, "QTL_thrs_test_2.png"))
+rm(joinpath(@__DIR__, "QTL_thrs_test_1.png"))
+rm(joinpath(@__DIR__, "QTL_thrs_test_2.png"))
 
 
 # testing plotting attributes

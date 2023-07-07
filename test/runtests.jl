@@ -1,9 +1,8 @@
 using BigRiverQTLPlots, BulkLMM
-using Statistics, Random
 using Plots
 using FileIO, Helium
 using Test
-ENV["GKSwstype"] = "100"
+ENV["GKSwstype"] = "nul"
 
 @testset "BigRiverQTLPlots.jl" begin
     include("utils_tests.jl")

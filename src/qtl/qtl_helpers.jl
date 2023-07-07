@@ -18,30 +18,31 @@ List of the utils functions
 
 """
 
-function perms_thresholds(mLOD::Matrix(<: AbstractFloat), thresholds::Vector{<: AbstractFloat}) 
-Returns LOD thresholds.
+function perms_thresholds(mLOD::Matrix(<: AbstractFloat), significance::Vector{<: AbstractFloat}) 
+
+	Returns LOD thresholds.
 
 # Arguments
 - mLOD is a matrix containing the LOD scores permutations.
-- thresholds contains the significant levels, default values are 0.90 and 0.95.
+- significance contains the significant levels, default values are 0.10 and 0.05.
 
 # Output
 - thresholds_lod contains the LOD scores corresponding to the significant levels.
 
 """
 
-function perms_thresholds(mLOD::Matrix{<: AbstractFloat}, thresholds::Vector = [0.90, 0.95])
+function perms_thresholds(mLOD::Matrix{<: AbstractFloat}, significance::Vector = [0.10, 0.05])
 
 	# default thresholds
-	if isempty(thresholds)
-		thresholds = [0.90, 0.95]
+	if isempty(significance)
+		significance = [0.10, 0.05]
 	end
 
 	# get maximum values for each column
 	max_lods = vec(mapslices(x -> maximum(x), mLOD; dims = 1))
 
 	# get LOD values corresponding significances values
-	thresholds_lod = map(x -> quantile(max_lods, x), thresholds)
+	thresholds_lod = map(x -> quantile(max_lods, x), 1 .- significance)
 
 	return thresholds_lod
 end
@@ -205,7 +206,10 @@ Generates a scatter plot for QTL analysis.
 - `dfgInfo` is a dataframe containing the genotype information such as locus, cM distance, chromosomes names and Mb distance. 
 - `chrColname` is the name of the column containing the chromosomes' names, default name is "Chr".
 - `mbColname` is the name of the column containing the megabase DNA length, default name is "Mb". 
-- `thresholds` is <: AbstractFloat number vector containing significant levels to estimate LOD score thresholds.
+- `significance` is <: AbstractFloat number vector containing significant levels to estimate LOD score thresholds.
+
+If the `scanresult` does not contain a permutation matrix, the original maximum LOD scores will be plotted, and the values in 
+the `significance` vector will be used as the threshold values for comparison.
 
 """
 function plot_QTL(vLOD::Vector{<: AbstractFloat}, dfgInfo::DataFrame;
@@ -225,12 +229,12 @@ end
 
 function plot_QTL(scanresult::NamedTuple, dfgInfo::DataFrame;
 	chrColname::String = "Chr", mbColname::String = "Mb",
-	thresholds::Vector = [], kwargs...)
+	significance::Vector = [], kwargs...)
 
 	if (:L_perms in keys(scanresult))
-		thrshlds = perms_thresholds(scanresult.L_perms, thresholds)
+		thrshlds = perms_thresholds(scanresult.L_perms, significance)
 	else
-		thrshlds = thresholds
+		thrshlds = significance
 	end
 
 	plot_QTL(
