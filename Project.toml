@@ -1,6 +1,6 @@
 name = "BigRiverQTLPlots"
 uuid = "042156b7-ffc6-4e52-80f3-70a9c31dd28f"
-authors = ["faragegr <gfarage@uthsc.edu>"]
+authors = ["Gregory Farage, Zifan Yu, Saunak Sen"]
 version = "0.1.0"
 
 [deps]

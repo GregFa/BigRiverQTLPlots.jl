@@ -9,12 +9,12 @@ bulklmmdir = dirname(pathof(BulkLMM));
 
 gmap_file = joinpath(bulklmmdir, "..", "data", "bxdData", "gmap.csv");
 gInfo = BulkLMM.CSV.read(gmap_file, BulkLMM.DataFrames.DataFrame);
-idx_geno = findall(occursin.(gInfo.Chr, "1 2 3"));
+idx_geno = findall(occursin.(gInfo.Chr, "1 2"));
 gInfo_subset = gInfo[idx_geno, :];
 
 phenocovar_file = joinpath(bulklmmdir, "..", "data", "bxdData", "phenocovar.csv");
 pInfo = BulkLMM.CSV.read(phenocovar_file, BulkLMM.DataFrames.DataFrame);
-idx_pheno = findall(occursin.(pInfo.Chr, "1 2 3"));
+idx_pheno = findall(occursin.(pInfo.Chr, "1 2"));
 pInfo_subset = pInfo[idx_pheno, :];
 
 pheno_file = joinpath(bulklmmdir, "..", "data", "bxdData", "spleen-pheno-nomissing.csv");
