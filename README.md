@@ -1,5 +1,10 @@
 # BigRiverQTLPlots.jl
 
+*Statistical plotting recipes for QTL analysis.*
+
+[![CI](https://github.com/senresearch/BigRiverQTLPlots.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/senresearch/BigRiverQTLPlots.jl/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/senresearch/BigRiverQTLPlots.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/senresearch/BigRiverQTLPlots.jl)
+
 `BigRiverQTLPlots.jl` is a versatile plotting package built in the Julia programming language. The package consists of specific plotting recipes, designed to streamline data visualization and enhance the process of statistical analysis in genetic studies. It's particularly suited for QTL (Quantitative Trait Loci) and eQTL (expression Quantitative Trait Loci) analyses, providing key features for clear and intuitive data representation.
 
 ## Features
