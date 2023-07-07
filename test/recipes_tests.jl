@@ -107,15 +107,18 @@ x, y, vecSteps, v_chr_names = get_plot_QTL_inputs(single_results.lod, gInfo);
 plot_QTL(single_results.lod, gInfo);
 savefig(joinpath(@__DIR__, "QTL_test.png"));
 
-# generate test plotting with thresholds obtain from perms_thresholds()
-plot_QTL(single_results_perms, gInfo, significance = [0.10, 0.05]);
-savefig(joinpath(@__DIR__, "QTL_thrs_test_1.png"));
 
 # generate test plotting with manual thresholds
 # thrs = BigRiverQTLPlots.perms_thresholds(single_results_perms.L_perms, [0.10, 0.05]);
 thrs = Helium.readhe(joinpath(@__DIR__, "data", "thresholds.he"))[:,1];
 plot_QTL(single_results_perms.lod, gInfo, thresholds = thrs);
+savefig(joinpath(@__DIR__, "QTL_thrs_test_1.png"));
+
+
+# generate test plotting with thresholds obtain from perms_thresholds()
+plot_QTL(single_results_perms, gInfo, significance = [0.10, 0.05]);
 savefig(joinpath(@__DIR__, "QTL_thrs_test_2.png"));
+
 
 # load references images
 img_ref = FileIO.load(joinpath(@__DIR__, "..", "images", "QTL_example.png")); # ref image
