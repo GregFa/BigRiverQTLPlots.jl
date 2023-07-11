@@ -20,7 +20,6 @@ To install `BigRiverQTLPlots.jl`, you can use Julia's package manager. Here is t
 ```julia
 using Pkg
 Pkg.add("BigRiverQTLPlots")
-
 ```
 
 ## Usage
@@ -30,21 +29,136 @@ After installing `BigRiverQTLPlots.jl`, you can include it in your Julia script 
 using BigRiverQTLPlots
 ```
 
-From there, you can start using `plot_QTL`, `plot_eQTL`, and `confplot` to plot your data. For example:
+From there, you can start using `plot_QTL` and `plot_eQTL` to plot your data. For example:
 
 ```julia
 # Assuming `single_results_perms` are restulting lod scores
 # gInfo contains genotype information  
 plot_QTL(single_results_perms, gInfo)
-
-
+```
+```julia
 # Assuming `lod_scores` are in multipletraits_results
 # pInfo contains phenotype information
 # gInfo contains genotype information  
 # thresh is your LOD threshold value
 plot_eQTL(multipletraits_results, pInfo, gInfo; threshold = 5.0)
-
 ```
+## QTL Examples
+```julia
+using BigRiverQTLPlots, BulkLMM
+using Plots
+
+##############
+# BXD spleen #
+##############
+
+########
+# Data #
+########
+bulklmmdir = dirname(pathof(BulkLMM));
+
+gmap_file = joinpath(bulklmmdir, "..", "data", "bxdData", "gmap.csv");
+gInfo = BulkLMM.CSV.read(gmap_file, BulkLMM.DataFrames.DataFrame);
+
+phenocovar_file = joinpath(bulklmmdir, "..", "data", "bxdData", "phenocovar.csv");
+pInfo = BulkLMM.CSV.read(phenocovar_file, BulkLMM.DataFrames.DataFrame);
+
+pheno_file = joinpath(bulklmmdir, "..", "data", "bxdData", "spleen-pheno-nomissing.csv");
+pheno = BulkLMM.DelimitedFiles.readdlm(pheno_file, ',', header = false);
+ # exclude the header, the first (transcript ID)and the last columns (sex)
+pheno_processed = pheno[2:end, 2:(end-1)] .* 1.0;
+
+geno_file = joinpath(bulklmmdir, "..", "data", "bxdData", "spleen-bxd-genoprob.csv")
+geno = BulkLMM.DelimitedFiles.readdlm(geno_file, ',', header = false);
+geno_processed = geno[2:end, 1:2:end] .* 1.0;
+
+#################
+# Preprocessing #
+#################
+traitID = 1112;
+pheno_y = reshape(pheno_processed[:, traitID], :, 1);
+
+###########
+# Kinship #
+###########
+kinship = calcKinship(geno_processed);
+
+########
+# Scan #
+########
+
+single_results_perms = scan(
+	pheno_y,
+	geno_processed,
+	kinship;
+	permutation_test = true,
+	nperms = 1000,
+);
+
+########
+# Plot #
+########
+plot_QTL(single_results_perms, gInfo, significance = [0.10, 0.05])
+
+# or by specifying the thresholds values
+
+thrs = BigRiverQTLPlots.perms_thresholds(single_results_perms.L_perms, [0.10, 0.05]);
+
+plot_QTL(single_results_perms.lod, gInfo, thresholds = thrs);
+```
+
+![alt QTL](images/QTL_thrs_example.png)
+
+## eQTL Examples
+```julia
+using BigRiverQTLPlots, BulkLMM
+using Plots
+
+##############
+# BXD spleen #
+##############
+
+########
+# Data #
+########
+bulklmmdir = dirname(pathof(BulkLMM));
+
+gmap_file = joinpath(bulklmmdir, "..", "data", "bxdData", "gmap.csv");
+gInfo = BulkLMM.CSV.read(gmap_file, BulkLMM.DataFrames.DataFrame);
+
+phenocovar_file = joinpath(bulklmmdir, "..", "data", "bxdData", "phenocovar.csv");
+pInfo = BulkLMM.CSV.read(phenocovar_file, BulkLMM.DataFrames.DataFrame);
+
+pheno_file = joinpath(bulklmmdir, "..", "data", "bxdData", "spleen-pheno-nomissing.csv");
+pheno = BulkLMM.DelimitedFiles.readdlm(pheno_file, ',', header = false);
+
+geno_file = joinpath(bulklmmdir, "..", "data", "bxdData", "spleen-bxd-genoprob.csv")
+geno = BulkLMM.DelimitedFiles.readdlm(geno_file, ',', header = false);
+geno_processed = geno[2:end, 1:2:end] .* 1.0;
+
+###########
+# Kinship #
+###########
+kinship = calcKinship(geno_processed);
+
+########
+# Scan #
+########
+
+multipletraits_results, heritability_results = bulkscan_null(
+	pheno_processed,
+	geno_processed,
+	kinship,
+)
+
+########
+# Plot #
+########
+plot_eQTL(multipletraits_results, pInfo, gInfo; threshold = 5.0);
+```
+
+![alt QTL](images/eQTL_example2.png)
+
 
 ## Contribution
 Contributions to BigRiverQTLPlots.jl are welcome and appreciated. If you'd like to contribute, please fork the repository and make changes as you'd like. If you have any questions or issues, feel free to open an issue on the repository.
