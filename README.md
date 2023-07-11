@@ -43,7 +43,9 @@ plot_QTL(single_results_perms, gInfo)
 # thresh is your LOD threshold value
 plot_eQTL(multipletraits_results, pInfo, gInfo; threshold = 5.0)
 ```
-## QTL Examples
+## Examples
+The following examples provide a basic idea of how to use the functions provided by `BigRiverPlots.jl`. Before proceeding, ensure that you've installed `BigRiverPlots.jl` and imported it into your Julia script using `using BigRiverPlots` along with `Plots.jl`. We use the package `BulkLMM.jl` to process the data.
+### Example 1: QTL Plot
 ```julia
 using BigRiverQTLPlots, BulkLMM
 using Plots
@@ -107,9 +109,11 @@ thrs = BigRiverQTLPlots.perms_thresholds(single_results_perms.L_perms, [0.10, 0.
 plot_QTL(single_results_perms.lod, gInfo, thresholds = thrs);
 ```
 
-![alt QTL](images/QTL_thrs_example.png)
+![alt QTL](images/QTL_thrs_example.svg)
 
-## eQTL Examples
+
+### Example 2: eQTL Plot
+
 ```julia
 using BigRiverQTLPlots, BulkLMM
 using Plots
@@ -157,7 +161,7 @@ multipletraits_results, heritability_results = bulkscan_null(
 plot_eQTL(multipletraits_results, pInfo, gInfo; threshold = 5.0);
 ```
 
-![alt QTL](images/eQTL_example2.png)
+![alt QTL](images/eQTL_example2.svg)
 
 
 ## Contribution
