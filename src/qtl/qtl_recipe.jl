@@ -33,8 +33,11 @@
     idx_bar = findall(isodd.(eachindex(steps[2:end])));
 
     # get maximum LOD value
-    y_max = 1.25*round(maximum(y[y.!=Inf]));
-
+    if length(h.args) == 4
+        y_max = 1.25*round(maximum(y[y.!=Inf]));
+    else
+        y_max = 1.25*round(maximum(vcat(y[y.!=Inf], thresh)));
+    end
 
     # set a default value for an attribute with `-->`
     xlabel --> "Locus (Chromosome)"
