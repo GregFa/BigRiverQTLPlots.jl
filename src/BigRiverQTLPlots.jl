@@ -11,12 +11,18 @@ module BigRiverQTLPlots
 
     # qtl functions
     include("./qtl/qtl_recipe.jl");
-    export qtlplot, QTLPlot   
+    export qtlplot, QTLPlot, manhattanplot, ManhattanPlot    
 
     include("./qtl/qtl_helpers.jl");
-    export plot_QTL, plot_QTL!, get_plot_QTL_inputs
+    export  perms_thresholds, get_plot_QTL_inputs
     
+    include("./qtl/plot_QTL.jl");
+    export plot_QTL, plot_QTL!
+
+    include("./qtl/plot_manhattan.jl");
+    export plot_manhattan, plot_manhattan!, manhattancolor
     
+   
     # eqtl functions 
     include("./eqtl/eqtl_recipe.jl");
     export eqtlplot, EQTLPlot   
