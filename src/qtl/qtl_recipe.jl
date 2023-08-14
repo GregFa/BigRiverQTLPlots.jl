@@ -23,6 +23,9 @@
 		error("QTL Plots should be given at least four vectors.  Got: $(typeof(h.args))")
 	end
 
+    #############
+	# Arguments #
+	#############
 	# get arguments
 	if length(h.args) == 4
 		x, y, steps, chr_names = h.args
@@ -30,8 +33,16 @@
 		x, y, steps, chr_names, thresh = h.args
 	end
 
-	# get number of shaded area for chromosomes
+	#################
+	# Bars location #
+	#################
+	
+    # get number of shaded area for chromosomes
 	idx_bar = findall(isodd.(eachindex(steps[2:end])))
+
+	###################
+	# Axis attributes #
+	###################
 
 	# get maximum LOD value
 	if length(h.args) == 4
@@ -74,10 +85,9 @@
 	# yticks := (pseudotick(steps), chr_names)
 
 
-
-	############################
-	# Bar separting chromosome #
-	############################
+	#############################
+	# Bar separating chromosome #
+	#############################
 	@series begin
 		seriestype := :bar
 		# marker_z := lod
