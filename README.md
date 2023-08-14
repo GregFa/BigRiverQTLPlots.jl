@@ -100,6 +100,7 @@ single_results_perms = scan(
 ########
 # Plot #
 ########
+# to change bar color in the background use the keyword `barcolor`
 plot_QTL(single_results_perms, gInfo, significance = [0.10, 0.05])
 
 # or by specifying the thresholds values
@@ -111,8 +112,30 @@ plot_QTL(single_results_perms.lod, gInfo, thresholds = thrs);
 
 ![alt QTL](images/QTL_thrs_example.svg)
 
+### Example 2: Manhattan Plot
+Similarly, we can generate a manhattan plot using `plot_manhattan` function. 
 
-### Example 2: eQTL Plot
+```julia
+plot_manhattan(single_results_perms, gInfo, significance = [0.10, 0.05] );
+```
+
+![alt QTL](images/manhattan_thrs_example.svg)
+
+Use the keywords `manhattancolor` to customize the scatter plot colors.
+
+```julia
+plot_manhattan(
+	single_results_perms, gInfo, 
+	significance = [0.10, 0.05],
+	manhattancolor = ["#a6cee3", "#1f78b4"],
+	);
+```
+
+![alt QTL](images/manhattan_thrs_example2.svg)
+
+
+
+### Example 3: eQTL Plot
 
 ```julia
 using BigRiverQTLPlots, BulkLMM

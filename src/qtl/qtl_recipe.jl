@@ -161,7 +161,7 @@ end
 @userplot ManhattanPlot
 
 @recipe function f(h::ManhattanPlot;
-	manhattancolor = ["#bcbddc", "#756bb1"])
+	manhattancolor = ["#756bb1", "#bcbddc"])
 	# check types of the input arguments
 	if length(h.args) < 4 || !(typeof(h.args[1]) <: AbstractVector) ||
 	   !(typeof(h.args[2]) <: AbstractVector) || !(typeof(h.args[3]) <: AbstractVector) ||

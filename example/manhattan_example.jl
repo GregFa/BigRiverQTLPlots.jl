@@ -37,7 +37,6 @@ pheno_y = reshape(pheno_processed[:, traitID], :, 1);
 ###########
 kinship = calcKinship(geno_processed);
 
-
 ########
 # Scan #
 ########
@@ -56,10 +55,6 @@ kinship = calcKinship(geno_processed);
 	kinship,
 );
 
-thrs = BigRiverQTLPlots.perms_thresholds(single_results_perms.L_perms, [0.90, 0.95]);
-println(thrs)
-
-x, y, vecSteps, v_chr_names = get_plot_QTL_inputs(single_results.lod, gInfo)
 
 ########
 # Plot #
@@ -67,14 +62,21 @@ x, y, vecSteps, v_chr_names = get_plot_QTL_inputs(single_results.lod, gInfo)
 
 mycolor = ["#1f78b4", "#a6cee3", "#756bb1", "#bcbddc"];
 
-plot_manhattan(single_results, gInfo, 
-markersize = 2,
-manhattancolor = [mycolor[2] , mycolor[1]],
-)
-
-
-plot_QTL(single_results, gInfo, 
-	bar_color = :violet,
+plot_manhattan(
+	single_results, gInfo,
 	)
-plot_QTL(single_results_perms, gInfo)
-plot_manhattan(single_results_perms, gInfo, significance = [])
+savefig(joinpath(@__DIR__, "..", "images", "manhattan_example.png"))
+
+plot_manhattan(
+	single_results_perms, gInfo, 
+	significance = [0.10, 0.05],
+	)
+savefig(joinpath(@__DIR__, "..", "images", "manhattan_thrs_example.png"))
+savefig(joinpath(@__DIR__, "..", "images", "manhattan_thrs_example.svg"))
+
+plot_manhattan(
+	single_results_perms, gInfo, 
+	significance = [0.10, 0.05],
+	manhattancolor = [mycolor[2] , mycolor[1]],
+	)
+savefig(joinpath(@__DIR__, "..", "images", "manhattan_thrs_example2.svg"))
