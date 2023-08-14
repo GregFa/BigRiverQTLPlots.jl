@@ -11,9 +11,6 @@ List of the utils functions
 - get_qtl_coord
 	Return coordinates vectors for plotting QTL figure.
 
-- plot_QTL
-	Generates a scatter plot for QTL analysis.        
-
 =#
 
 """

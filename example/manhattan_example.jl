@@ -1,4 +1,3 @@
-
 using BigRiverQTLPlots
 using BulkLMM
 using Random, Statistics
@@ -66,66 +65,16 @@ x, y, vecSteps, v_chr_names = get_plot_QTL_inputs(single_results.lod, gInfo)
 # Plot #
 ########
 
-mycolor = ["#1f78b4", "#a6cee3", "#756bb1", "#bcbddc"]
+mycolor = ["#1f78b4", "#a6cee3", "#756bb1", "#bcbddc"];
 
 plot_manhattan(single_results, gInfo, 
-markersize = 3,
-markercolor= manahattancolor(single_results, mycolor[2] , mycolor[1]),
+markersize = 2,
+manhattancolor = [mycolor[2] , mycolor[1]],
 )
 
 
-plot_QTL(single_results_perms, gInfo)
+plot_QTL(single_results, gInfo, 
+	bar_color = :violet,
+	)
 plot_QTL(single_results_perms, gInfo)
 plot_manhattan(single_results_perms, gInfo, significance = [])
-
-scatter(x, y,  
-	grid = false,
-	legend = false, 
-	xticks = (pseudoticks(vecSteps[2:end]), v_chr_names),
-	markercolor= ifelse.(is_chr_odd , mycolor[3] , mycolor[4]),
-	markersize = 3,
-	markerstrokewidth = 0.1,
-
-	)
-
-	v_chr_names
-
-
-idx_Inf = vcat([1],findall(y.==Inf))
-n = length(y)
-is_chr_odd = repeat([true], n)
-
-for i in 1:length(idx_Inf)-1
-	is_chr_odd[idx_Inf[i]:idx_Inf[i+1]].= isodd(i)
-end
-# is_chr_odd[idx_Inf[2:end]] .= Inf
-
-scatter(x, y,
-markercolor= ifelse.(is_chr_odd , "blue" , "red")
-)
-
-
-
-
-length(is_chr_odd)
-
-
-
-
-
-
-
-
-
-
-plot_QTL(single_results.lod, gInfo, seriestype = :scatter,  marker = 0.5)
-
-
-plot_QTL(single_results_perms, gInfo, 
-seriestype = :scatter,  markersize = 0.5,
-thresholds = [0.90, 0.95])
-
-
-
-
-plot(single_results.lod, (seriestype = :scatter,  markersize = 0.5))
