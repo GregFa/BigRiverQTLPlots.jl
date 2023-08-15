@@ -101,25 +101,3 @@ function plot_manhattan!(scanresult::NamedTuple, dfgInfo::DataFrame;
 
 end
 
-
-
-function manhattancolor(scanresult::NamedTuple, color1::String, color2::String)
-	
-	# we use 2 alternating colors, for all chromosomes
-	x, y, vecSteps, v_chr_names = get_plot_QTL_inputs(vLOD, dfgInfo;
-	chrColname = chrColname, mbColname = mbColname)
-    # ininitialize vector indicating chromosome color
-    n = length(x)
-    is_chr_odd = repeat([true], n)
-
-    # find indices chromosme frontier
-    idx_Inf = vcat([1],findall(x.==Inf))
-
-    # assign true for odd chromosome position and false otherwise
-    for i in 1:length(idx_Inf)-1
-        is_chr_odd[idx_Inf[i]:idx_Inf[i+1]].= isodd(i)
-    end
-
-	return ifelse.(is_chr_odd , color1, color2)	
-
-end

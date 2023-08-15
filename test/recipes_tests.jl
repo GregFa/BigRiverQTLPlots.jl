@@ -151,3 +151,59 @@ println("QTL plot attributes :x test: ",
 idx_not_Inf = findall(y .!= Inf);
 println("QTL plot attributes :y test: ", 
 			@test plot_obj[1][3].plotattributes[:y][idx_not_Inf] == y[idx_not_Inf]);
+
+
+#########################
+# Test Manhattan Recipe #
+#########################
+
+# generate plotting and save image as png to compare with the reference image 
+plot_manhattan(single_results.lod, gInfo);
+savefig(joinpath(@__DIR__, "manhattan_test.png"));
+
+
+# generate test plotting with manual thresholds
+# thrs = BigRiverQTLPlots.perms_thresholds(single_results_perms.L_perms, [0.10, 0.05]);
+thrs = Helium.readhe(joinpath(@__DIR__, "data", "thresholds.he"))[:,1];
+plot_manhattan(single_results_perms.lod, gInfo, thresholds = thrs);
+savefig(joinpath(@__DIR__, "manhattan_thrs_test_1.png"));
+
+
+# generate test plotting with thresholds obtain from perms_thresholds()
+plot_manhattan(single_results_perms, gInfo, significance = [0.10, 0.05]);
+savefig(joinpath(@__DIR__, "manhattan_thrs_test_2.png"));
+
+
+# load references images
+img_ref = FileIO.load(joinpath(@__DIR__, "..", "images", "manhattan_example.png")); # ref image
+img_thrs_ref = FileIO.load(joinpath(@__DIR__, "..", "images", "manhattan_thrs_example.png")); # ref image with thresholds
+
+# load test images
+img_test = FileIO.load(joinpath(@__DIR__, "manhattan_test.png")); # new image
+img_thrs_test_1 = FileIO.load(joinpath(@__DIR__, "manhattan_thrs_test_1.png")); # new image with thresholds
+img_thrs_test_2 = FileIO.load(joinpath(@__DIR__, "manhattan_thrs_test_2.png")); # new image with thresholds
+
+# test plotting results
+println("Manhattan plot image test: ", @test (img_test == img_ref));
+println("Manhattan plot image with thresholds (manual) test: ", 
+@test sum(1 .*(img_thrs_test_1 .== img_thrs_ref))==size(img_thrs_ref,1)*size(img_thrs_ref,2));
+println("Manhattan plot image with thresholds (manual) test: ", @test img_thrs_test_1 == img_thrs_ref);
+# println("Manhattan plot image with thresholds (manual vs auto) test: ", @test img_thrs_test_2 == img_thrs_test_1);
+
+# clear new plot
+rm(joinpath(@__DIR__, "manhattan_test.png"))
+rm(joinpath(@__DIR__, "manhattan_thrs_test_1.png"))
+rm(joinpath(@__DIR__, "manhattan_thrs_test_2.png"))
+
+
+# testing plotting attributes
+plot_obj = manhattanplot(x, y, vecSteps, v_chr_names, thrs);
+
+idx_not_Inf = findall(x .!= Inf);
+println("Manhattan plot attributes :x test: ", 
+			@test plot_obj[1][1].plotattributes[:x][idx_not_Inf] == x[idx_not_Inf]);
+idx_not_Inf = findall(y .!= Inf);
+println("Manhattan plot attributes :y test: ", 
+			@test plot_obj[1][1].plotattributes[:y][idx_not_Inf] == y[idx_not_Inf]);
+
+

@@ -20,7 +20,7 @@ module BigRiverQTLPlots
     export plot_QTL, plot_QTL!
 
     include("./qtl/plot_manhattan.jl");
-    export plot_manhattan, plot_manhattan!, manhattancolor
+    export plot_manhattan, plot_manhattan!
     
    
     # eqtl functions 
@@ -28,6 +28,8 @@ module BigRiverQTLPlots
     export eqtlplot, EQTLPlot   
 
     include("./eqtl/eqtl_helpers.jl");
+
+    include("./eqtl/plot_eQTL.jl");
     export plot_eQTL
 
 
