@@ -1,7 +1,7 @@
 name = "BigRiverQTLPlots"
 uuid = "042156b7-ffc6-4e52-80f3-70a9c31dd28f"
 authors = ["Gregory Farage, Zifan Yu, Saunak Sen"]
-version = "0.2.0"
+version = "0.2.1"
 
 [deps]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"

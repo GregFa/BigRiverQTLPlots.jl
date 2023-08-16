@@ -82,7 +82,7 @@
 	tick_direction := :out
 
 	xticks := (pseudoticks(steps[2:end]), chr_names)
-	# yticks := (pseudotick(steps), chr_names)
+	yticks --> 0:1:y_max
 
 
 	#############################
@@ -103,6 +103,7 @@
 
 
 		pseudoticks(steps[2:end])[idx_bar], repeat([y_max], length(idx_bar))
+		# pseudoticks(steps[2:end])[idx_bar], repeat([ylims[2]], length(idx_bar))
 	end
 
 	##############
@@ -236,7 +237,7 @@ end
 	tick_direction := :out
 
 	xticks := (pseudoticks(steps[2:end]), chr_names)
-	# yticks := (pseudotick(steps), chr_names)
+	yticks --> 0:1:y_max
 
 
 	##############
