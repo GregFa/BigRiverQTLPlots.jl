@@ -15,6 +15,7 @@
 @userplot QTLPlot
 
 @recipe function f(h::QTLPlot;
+	yaxis_max = 0,
 	barcolor = :lightsalmon)
 	# check types of the input arguments
 	if length(h.args) < 4 || !(typeof(h.args[1]) <: AbstractVector) ||
@@ -46,9 +47,9 @@
 
 	# get maximum LOD value
 	if length(h.args) == 4
-		y_max = 1.25 * round(maximum(y[y.!=Inf]))
+		y_max = 1.25 * round(maximum(vcat(y[y.!=Inf], [yaxis_max])))
 	else
-		y_max = 1.25 * round(maximum(vcat(y[y.!=Inf], thresh)))
+		y_max = 1.25 * round(maximum(vcat(y[y.!=Inf], [yaxis_max], thresh)))
 	end
 
 	# set a default value for an attribute with `-->`
@@ -162,6 +163,7 @@ end
 @userplot ManhattanPlot
 
 @recipe function f(h::ManhattanPlot;
+	yaxis_max = 0,
 	manhattancolor = ["#756bb1", "#bcbddc"])
 	# check types of the input arguments
 	if length(h.args) < 4 || !(typeof(h.args[1]) <: AbstractVector) ||
@@ -203,9 +205,9 @@ end
 
 	# get maximum LOD value
 	if length(h.args) == 4
-		y_max = 1.25 * round(maximum(y[y.!=Inf]))
+		y_max = 1.25 * round(maximum(vcat(y[y.!=Inf], [yaxis_max])))
 	else
-		y_max = 1.25 * round(maximum(vcat(y[y.!=Inf], thresh)))
+		y_max = 1.25 * round(maximum(vcat(y[y.!=Inf], [yaxis_max], thresh)))
 	end
 
 	# set a default value for an attribute with `-->`
