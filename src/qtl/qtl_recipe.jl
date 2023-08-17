@@ -110,8 +110,8 @@
 
 		# get the seriescolor passed by the user
 		alpha --> 0.2
-		linecolor --> barcolor#nothing
-		color --> barcolor
+		linecolor := barcolor#nothing
+		color := barcolor
 
 
 		pseudoticks(steps[2:end])[idx_bar], repeat([y_max], length(idx_bar))
