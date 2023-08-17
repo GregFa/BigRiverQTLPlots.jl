@@ -66,5 +66,6 @@ plot_QTL(single_results.lod, gInfo)
 savefig(joinpath(@__DIR__, "..", "images", "QTL_example.png"))
 
 plot_QTL(single_results_perms, gInfo, significance = [0.10, 0.05])
+savefig(joinpath(@__DIR__, "..", "images", "QTL_thrs_example.png"))
 savefig(joinpath(@__DIR__, "..", "images", "QTL_thrs_example.svg"))
 

@@ -112,6 +112,8 @@ plot_QTL(single_results_perms.lod, gInfo, thresholds = thrs);
 
 ![alt QTL](images/QTL_thrs_example.svg)
 
+The colors of the background bars and the threshold lines in the chart can be easily customized. To change the color of the background bars, use the `barcolor` argument, and to set the color of the threshold lines, use the `thresholdcolor` argument. These arguments accept standard Julia color codes, and HEX values.
+
 ### Example 2: Manhattan Plot
 Similarly, we can generate a manhattan plot using `plot_manhattan` function. 
 

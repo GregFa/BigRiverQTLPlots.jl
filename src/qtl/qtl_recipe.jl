@@ -15,7 +15,8 @@
 @userplot QTLPlot
 
 @recipe function f(h::QTLPlot;
-	barcolor = :lightsalmon)
+	thresholdcolor = "#737373",
+	barcolor = "#bf812d")
 	# check types of the input arguments
 	if length(h.args) < 4 || !(typeof(h.args[1]) <: AbstractVector) ||
 	   !(typeof(h.args[2]) <: AbstractVector) || !(typeof(h.args[3]) <: AbstractVector) ||
@@ -23,7 +24,7 @@
 		error("QTL Plots should be given at least four vectors.  Got: $(typeof(h.args))")
 	end
 
-    #############
+	#############
 	# Arguments #
 	#############
 	# get arguments
@@ -33,11 +34,13 @@
 		x, y, steps, chr_names, thresh = h.args
 	end
 
+	my_ylims = get(plotattributes, :ylims, :auto)
+
 	#################
 	# Bars location #
 	#################
-	
-    # get number of shaded area for chromosomes
+
+	# get number of shaded area for chromosomes
 	idx_bar = findall(isodd.(eachindex(steps[2:end])))
 
 	###################
@@ -46,9 +49,16 @@
 
 	# get maximum LOD value
 	if length(h.args) == 4
-		y_max = 1.25 * round(maximum(y[y.!=Inf]))
+		y_max = 1.25 * round(maximum(vcat(
+			y[y.!=Inf],
+			[my_ylims == :auto ? 0 : my_ylims[2]],
+		)))
 	else
-		y_max = 1.25 * round(maximum(vcat(y[y.!=Inf], thresh)))
+		y_max = 1.25 * round(maximum(vcat(
+			y[y.!=Inf],
+			[my_ylims == :auto ? 0 : my_ylims[2]],
+			thresh,
+		)))
 	end
 
 	# set a default value for an attribute with `-->`
@@ -73,7 +83,9 @@
 	# yaxis := false 
 	xlims --> (0, steps[end])
 	ylims --> (0, y_max)
-	grid --> (:y)
+	grid --> :y
+	gridwidth --> 0.7
+	gridalpha --> 0.2
 	y_foreground_color_axis --> :white
 	y_foreground_color_border --> :white
 	x_foreground_color_border --> :white
@@ -82,7 +94,7 @@
 	tick_direction := :out
 
 	xticks := (pseudoticks(steps[2:end]), chr_names)
-	# yticks := (pseudotick(steps), chr_names)
+	yticks --> 0:1:y_max
 
 
 	#############################
@@ -103,6 +115,7 @@
 
 
 		pseudoticks(steps[2:end])[idx_bar], repeat([y_max], length(idx_bar))
+		# pseudoticks(steps[2:end])[idx_bar], repeat([ylims[2]], length(idx_bar))
 	end
 
 	##############
@@ -113,7 +126,7 @@
 		markershape := :none
 		# color --> :skyblue4
 		linecolor --> :skyblue4
-
+	
 		x, y
 
 	end
@@ -121,14 +134,14 @@
 	##################
 	# Vertical lines #
 	##################
-	@series begin
-		seriestype := :vline
-		linecolor := :lightgrey
-		primary := false
-		# alpha := 0.5
-		steps[1:end]
+	# @series begin
+	# 	seriestype := :vline
+	# 	linecolor := :lightgrey
+	# 	primary := false
+	# 	# alpha := 0.5
+	# 	steps[1:end]
 
-	end
+	# end
 
 	####################
 	# Horizontal lines #
@@ -136,7 +149,7 @@
 	if length(h.args) == 5
 		@series begin
 			seriestype := :hline
-			linecolor --> :red
+			linecolor --> thresholdcolor
 			linestyle --> :dash
 			primary := false
 			# alpha := 0.5
@@ -161,6 +174,7 @@ end
 @userplot ManhattanPlot
 
 @recipe function f(h::ManhattanPlot;
+	thresholdcolor = "#636363",
 	manhattancolor = ["#756bb1", "#bcbddc"])
 	# check types of the input arguments
 	if length(h.args) < 4 || !(typeof(h.args[1]) <: AbstractVector) ||
@@ -178,6 +192,7 @@ end
 		x, y, steps, chr_names, thresh = h.args
 	end
 
+	my_ylims = get(plotattributes, :ylims, :auto)
 
 	#######################
 	# Binary color style  #
@@ -202,9 +217,16 @@ end
 
 	# get maximum LOD value
 	if length(h.args) == 4
-		y_max = 1.25 * round(maximum(y[y.!=Inf]))
+		y_max = 1.25 * round(maximum(vcat(
+			y[y.!=Inf],
+			[my_ylims == :auto ? 0 : my_ylims[2]],
+		)))
 	else
-		y_max = 1.25 * round(maximum(vcat(y[y.!=Inf], thresh)))
+		y_max = 1.25 * round(maximum(vcat(
+			y[y.!=Inf],
+			[my_ylims == :auto ? 0 : my_ylims[2]],
+			thresh,
+		)))
 	end
 
 	# set a default value for an attribute with `-->`
@@ -227,7 +249,9 @@ end
 	# yaxis := false 
 	xlims --> (0, steps[end])
 	ylims --> (0, y_max)
-	grid --> (:y)
+	grid --> :y
+	gridwidth --> 0.7
+	gridalpha --> 0.2
 	y_foreground_color_axis --> :white
 	y_foreground_color_border --> :white
 	x_foreground_color_border --> :white
@@ -236,7 +260,7 @@ end
 	tick_direction := :out
 
 	xticks := (pseudoticks(steps[2:end]), chr_names)
-	# yticks := (pseudotick(steps), chr_names)
+	yticks --> 0:1:y_max
 
 
 	##############
@@ -260,7 +284,7 @@ end
 	if length(h.args) == 5
 		@series begin
 			seriestype := :hline
-			linecolor --> :red
+			linecolor --> thresholdcolor
 			linestyle --> :dash
 			primary := false
 			# alpha := 0.5
