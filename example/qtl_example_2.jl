@@ -3,7 +3,7 @@ using BigRiverQTLPlots
 using FlxQTL
 using Random, Statistics
 using Plots
-using DataFrames, Helium
+using DelimitedFiles, DataFrames, Helium
 
 ###############
 # Arabidopsis #
@@ -14,12 +14,14 @@ using DataFrames, Helium
 ########
 flxqtldir = dirname(pathof(FlxQTL));
 
+pheno_file = joinpath(flxqtldir, "..", "data", "Arabidopsis_fitness.csv");
+pheno = readdlm(pheno_file,',';skipstart=1); # skip to read the first row (column names) to obtain a matrix only
 
-pheno = readdlm("../../data/Arabidopsis_fitness.csv",',';skipstart=1); # skip to read the first row (column names) to obtain a matrix only
+geno_file = joinpath(flxqtldir, "..", "data", "Arabidopsis_genotypes.csv");
+geno = readdlm(geno_file,',';skipstart=1); 
 
-geno = readdlm("../../data/Arabidopsis_genotypes.csv",',';skipstart=1); 
-
-markerinfo = readdlm("../../data/Arabidopsis_markerinfo_1d.csv",',';skipstart=1);
+markerinfo_file = joinpath(flxqtldir, "..", "data", "Arabidopsis_markerinfo_1d.csv");
+markerinfo = readdlm(markerinfo_file,',';skipstart=1);
 
 gInfo = gInfo = DataFrame(
     Locus = markerinfo[:, 1];
@@ -41,25 +43,14 @@ m,q = size(Z)
 ###########
 # Kinship #
 ###########
-kinship = calcKinship(geno_processed);
+K = shrinkg(kinshipMan,10,XX.X);
+T,λ = K2eig(K);
 
 ########
 # Scan #
 ########
 
-single_results_perms = scan(
-	pheno_y,
-	geno_processed,
-	kinship;
-	permutation_test = true,
-	nperms = 1000,
-);
-
-single_results = scan(
-	pheno_y,
-	geno_processed,
-	kinship,
-);
+LODs,B,est0 = geneScan(1,T,λ,Ystd,XX); # MLMM
 
 thrs = BigRiverQTLPlots.perms_thresholds(single_results_perms.L_perms, [0.10, 0.05]);
 Helium.writehe(reshape(thrs, :, 1), joinpath(@__DIR__, "..", "test", "data", "thresholds.he"))
@@ -67,17 +58,11 @@ Helium.writehe(reshape(thrs, :, 1), joinpath(@__DIR__, "..", "test", "data", "th
 # Plot #
 ########
 
-using Plots
-using BigRiverQTLPlots
-using DataFrames
-
-gInfo = DataFrame(Chr = string.(markerinfo[:, 2]), cM = markerinfo[:,3], lod = Float64.(LODs));
-
-plot_QTL(gInfo.lod, select(gInfo, ["Chr", "cM"]); mbColname = "cM")
+plot_QTL(Float64.(LODs), gInfo; mbColname = "cM")
 
 
 plot_QTL(single_results.lod, gInfo)
-savefig(joinpath(@__DIR__, "..", "images", "QTL_example.png"))
+# savefig(joinpath(@__DIR__, "..", "images", "QTL_example.png"))
 
 plot_QTL(single_results_perms, gInfo, significance = [0.10, 0.05])
 savefig(joinpath(@__DIR__, "..", "images", "QTL_thrs_example.png"))
