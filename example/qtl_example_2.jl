@@ -52,19 +52,19 @@ T,λ = K2eig(K);
 
 LODs,B,est0 = geneScan(1,T,λ,Ystd,XX); # MLMM
 
-thrs = BigRiverQTLPlots.perms_thresholds(single_results_perms.L_perms, [0.10, 0.05]);
-Helium.writehe(reshape(thrs, :, 1), joinpath(@__DIR__, "..", "test", "data", "thresholds.he"))
+# thrs = BigRiverQTLPlots.perms_thresholds(single_results_perms.L_perms, [0.10, 0.05]);
+# Helium.writehe(reshape(thrs, :, 1), joinpath(@__DIR__, "..", "test", "data", "thresholds.he"))
 ########
 # Plot #
 ########
 
-plot_QTL(Float64.(LODs), gInfo; mbColname = "cM")
+plot_QTL(Float64.(LODs), gInfo; posColname = "cM")
 
 
-plot_QTL(single_results.lod, gInfo)
+# plot_QTL(single_results.lod, gInfo)
 # savefig(joinpath(@__DIR__, "..", "images", "QTL_example.png"))
 
-plot_QTL(single_results_perms, gInfo, significance = [0.10, 0.05])
-savefig(joinpath(@__DIR__, "..", "images", "QTL_thrs_example.png"))
-savefig(joinpath(@__DIR__, "..", "images", "QTL_thrs_example.svg"))
+# plot_QTL(single_results_perms, gInfo, significance = [0.10, 0.05])
+# savefig(joinpath(@__DIR__, "..", "images", "QTL_thrs_example.png"))
+# savefig(joinpath(@__DIR__, "..", "images", "QTL_thrs_example.svg"))
 

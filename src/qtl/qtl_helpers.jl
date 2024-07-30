@@ -146,7 +146,7 @@ end
 
 """
 get_plot_QTL_inputs(vLOD::Vector{<: AbstractFloat}, dfgInfo::DataFrame;
-					chrColname::String="Chr", mbColname::String="Mb")
+					chrColname::String="Chr", posColname::String="Mb")
 
 Obtains required inputs to generates a QTL plot.
 
@@ -155,14 +155,14 @@ Obtains required inputs to generates a QTL plot.
 - `dfpInfo` is a dataframe containing the phenotype information such as probeset, chromosomes names and Mb distance.
 - `dfgInfo` is a dataframe containing the genotype information such as locus, cM distance, chromosomes names and Mb distance. 
 - `chrColname` is the name of the column containing the chromosomes' names, default name is "Chr".
-- `mbColname` is the name of the column containing the megabase DNA length, default name is "Mb". 
+- `posColname` is the name of the column containing the megabase DNA length, default name is "Mb". 
 
 """
 function get_plot_QTL_inputs(vLOD::Vector{<: AbstractFloat}, dfgInfo::DataFrame;
-	chrColname::String = "Chr", mbColname::String = "Mb")
+	chrColname::String = "Chr", posColname::String = "Mb")
 
 	vecChr = String.(dfgInfo[:, Symbol(chrColname)])
-	vecLoci = dfgInfo[:, Symbol(mbColname)]
+	vecLoci = dfgInfo[:, Symbol(posColname)]
 
 
 	# get unique chr id

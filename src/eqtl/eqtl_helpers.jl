@@ -9,7 +9,7 @@ List of the utils functions
 
 """
 get_eQTL_accMb(mlodmax::Matrix{Float64}, dfpInfo::DataFrame, dfgInfo::DataFrame; 
-               chrColname::String = "Chr", mbColname::String = "Mb", threshold::Float64 = 5.0)=> 
+               chrColname::String = "Chr", posColname::String = "Mb", threshold::Float64 = 5.0)=> 
 
 
 Returns pseudo "acculumated" loci for plotting, according to the phenotype and genotype annotations.
@@ -19,7 +19,7 @@ Returns pseudo "acculumated" loci for plotting, according to the phenotype and g
 - `dfpInfo` is a dataframe containing the phenotype information such as probeset, chromosomes names and Mb distance
 - `dfgInfo` is a dataframe containing the genotype information such as locus, cM distance, chromosomes names and Mb distance  
 - `chrColname` column name containing the chromosomes information, default is `"Chr"`, in the dataframes. 
-- `mbColname` column name containing the Mb distance information, default is `"Mb"`, in the dataframes.
+- `posColname` column name containing the Mb distance information, default is `"Mb"`, in the dataframes.
 - `threshold` is the LOD threshold value, default is `5.0``.
 
 ## Output
@@ -31,7 +31,7 @@ Returns pseudo "acculumated" loci for plotting, according to the phenotype and g
 
 """
 function get_eQTL_accMb(multiLODs::Matrix{Float64}, dfpInfo::DataFrame, dfgInfo::DataFrame; 
-                        chrColname::String = "Chr", mbColname::String = "Mb", threshold::Float64 = 5.0)
+                        chrColname::String = "Chr", posColname::String = "Mb", threshold::Float64 = 5.0)
     
     # find the maximum LOD among each columns (gInfo) for each rows (pInfo)
     maxLODs_allTraits = mapslices(x -> findmax(x), multiLODs; dims = 1);
@@ -50,14 +50,14 @@ function get_eQTL_accMb(multiLODs::Matrix{Float64}, dfpInfo::DataFrame, dfgInfo:
     dfpInfo_filtered = copy(dfpInfo) #match_chrs_pheno_to_geno(dfpInfo, dfgInfo)
 
     # prepare filtered pheno dataframe to compute accumulated mb distance for plotting
-    rename!(dfpInfo_filtered, Dict(Symbol(mbColname) => :phenocovar_mb));
+    rename!(dfpInfo_filtered, Dict(Symbol(posColname) => :phenocovar_mb));
     rename!(dfpInfo_filtered, Dict(Symbol(chrColname) => :phenocovar_chr)); 
     dfpInfo_filtered[:, :acc_phenocovar_mb] .= dfpInfo_filtered.phenocovar_mb;
 
     # get a copy of genotype info dataframe
     gmap = copy(dfgInfo) 
-    gmap[!, :acc_geno_mb] = gmap[!, mbColname]
-    rename!(gmap, Dict(Symbol(mbColname) => :geno_mb));
+    gmap[!, :acc_geno_mb] = gmap[!, posColname]
+    rename!(gmap, Dict(Symbol(posColname) => :geno_mb));
     rename!(gmap, Dict(Symbol(chrColname) => :geno_chr)); 
     
     # get unique chromosomes names from genotype info dataframe
