@@ -174,7 +174,7 @@ kinship = calcKinship(geno_processed);
 # Scan #
 ########
 
-multipletraits_results, heritability_results = bulkscan_null(
+multipletraits_results = bulkscan_null(
 	pheno_processed,
 	geno_processed,
 	kinship,
@@ -183,7 +183,7 @@ multipletraits_results, heritability_results = bulkscan_null(
 ########
 # Plot #
 ########
-plot_eQTL(multipletraits_results, pInfo, gInfo; threshold = 5.0);
+plot_eQTL(multipletraits_results.L, pInfo, gInfo; threshold = 5.0);
 ```
 
 ![alt QTL](images/eQTL_example2.svg)

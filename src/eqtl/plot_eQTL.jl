@@ -12,18 +12,15 @@ Generates a scatter plot for eQTL analysis.
 - `threshold` is the LOD threshold value, default is `5.0``.
 
 """
-function plot_eQTL(multiLODs::Array{Float64, 2}, dfpInfo::DataFrame, dfgInfo::DataFrame;
-                  threshold::Float64 = 5.0, kwargs...)
+function plot_eQTL(multiLODs, dfpInfo, dfgInfo;
+                   threshold = 5.0,
+                   chrColname = "Chr", posColname = "Mb",
+                   kwargs...)
 
-    # get coordinates ready for plotting
-    x, y, z, mysteps, mychr = get_eQTL_accMb(
-                        multiLODs, 
-                        dfpInfo,
-                        dfgInfo;
-                        threshold = threshold,
-                        kwargs...
-                    )
+    x, y, lod, steps, chr_names = get_eQTL_accMb(multiLODs, dfpInfo, dfgInfo;
+                                                 chrColname = chrColname,
+                                                 posColname  = posColname,
+                                                 threshold  = threshold)
 
-    eqtlplot(x, y, z, mysteps, mychr; kwargs...)
-
+    eqtlplot(x, y, lod, steps, chr_names; kwargs...)
 end

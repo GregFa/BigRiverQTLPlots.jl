@@ -45,11 +45,12 @@ results_path = joinpath(@__DIR__, "..", "test", "data", "multipletraits_results.
 if isfile(results_path)
 	multipletraits_results = Helium.readhe(results_path)
 else
-	multipletraits_results, heritability_results = bulkscan_null(
+	multipletraits_results = bulkscan(
 		pheno_processed_subset,
 		geno_processed_subset,
 		kinship_subset,
 	)
+    multipletraits_results = multipletraits_results.L;
 	Helium.writehe(multipletraits_results, results_path)
 end
 
