@@ -174,7 +174,7 @@ kinship = calcKinship(geno_processed);
 # Scan #
 ########
 
-multipletraits_results = bulkscan_null(
+multipletraits_results = bulkscan(
 	pheno_processed,
 	geno_processed,
 	kinship,
